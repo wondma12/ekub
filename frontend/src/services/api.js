@@ -48,6 +48,13 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
         }
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        if (!originalRequest.url?.includes('/auth/')) {
+          window.location.href = '/login';
+        }
       } catch (refreshError) {
         // Refresh failed - logout user
         localStorage.removeItem('token');
