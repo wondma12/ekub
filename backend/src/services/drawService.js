@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 
 class DrawService {
   /**
-   * Create a new draw with one slot per active user.
+   * Create a new draw with one wheel slot per configured draw number.
    */
   async createDraw(data) {
     const transaction = await sequelize.transaction();
@@ -14,12 +14,9 @@ class DrawService {
         throw new Error(`Ekub ${data.ekub_id} was not found. Create an Ekub before creating a draw.`);
       }
 
-      const participantCount = await User.count({
-        where: { role: 'USER', status: 'ACTIVE' },
-        transaction,
-      });
-      if (participantCount === 0) {
-        throw new Error('At least one active registered user is required before creating a draw');
+      const numberCount = Number(data.draw_number);
+      if (!Number.isInteger(numberCount) || numberCount < 1) {
+        throw new Error('Draw number must be a positive integer');
       }
 
       const draw = await Draw.create({
@@ -28,15 +25,15 @@ class DrawService {
         draw_number: data.draw_number,
         title: data.title || `Draw #${data.draw_number}`,
         min_number: 1,
-        max_number: participantCount,
-        lucky_spin_count: Math.min(data.lucky_spin_count || 7, participantCount),
+        max_number: numberCount,
+        lucky_spin_count: Math.min(data.lucky_spin_count || 7, numberCount),
         created_by: data.created_by,
         status: 'DRAFT',
       }, { transaction });
 
-      // Generate one wheel slot per active participant.
+      // Generate one wheel slot per configured number.
       const numbers = [];
-      for (let i = 1; i <= participantCount; i++) {
+      for (let i = 1; i <= numberCount; i++) {
         numbers.push({
           draw_id: draw.id,
           number: i,
@@ -59,7 +56,7 @@ class DrawService {
   /**
    * Set lucky numbers for a draw (admin selected)
    */
-  async setLuckyNumbers(drawId, luckyUserIds, userId) {
+  async setLuckyNumbers(drawId, luckyNumbers) {
     const transaction = await sequelize.transaction();
 
     try {
@@ -67,27 +64,20 @@ class DrawService {
       if (!draw) throw new Error('Draw not found');
       if (draw.status !== 'DRAFT') throw new Error('Draw is not in draft status');
 
-      const normalizedIds = luckyUserIds.map(id => Number(id));
-      if (!Array.isArray(luckyUserIds) || normalizedIds.length === 0) {
-        throw new Error('Select at least one lucky user');
+      const normalizedNumbers = Array.isArray(luckyNumbers)
+        ? luckyNumbers.map(number => Number(number))
+        : [];
+      if (normalizedNumbers.length === 0) {
+        throw new Error('Select at least one lucky number');
       }
-      if (normalizedIds.length > 7) {
-        throw new Error('Select no more than 7 lucky users');
+      if (normalizedNumbers.length > 7) {
+        throw new Error('Select no more than 7 lucky numbers');
       }
-      if (new Set(normalizedIds).size !== normalizedIds.length) {
-        throw new Error('Lucky users must be unique');
+      if (new Set(normalizedNumbers).size !== normalizedNumbers.length) {
+        throw new Error('Lucky numbers must be unique');
       }
-      if (normalizedIds.some(id => !Number.isInteger(id) || id < 1)) {
-        throw new Error('Lucky user IDs must be valid registered user IDs');
-      }
-
-      const luckyUsers = await User.findAll({
-        where: { id: normalizedIds, role: 'USER', status: 'ACTIVE' },
-        attributes: ['id'],
-        transaction,
-      });
-      if (luckyUsers.length !== normalizedIds.length) {
-        throw new Error('Every lucky user must be an active registered user');
+      if (normalizedNumbers.some(number => !Number.isInteger(number) || number < 1 || number > draw.max_number)) {
+        throw new Error('Lucky numbers must be valid wheel numbers');
       }
 
       await DrawNumber.update(
@@ -101,10 +91,9 @@ class DrawService {
         transaction,
       });
 
-      for (let index = 0; index < normalizedIds.length; index += 1) {
-        const drawNumber = drawNumbers[index];
-        if (!drawNumber) break;
-
+      for (let index = 0; index < normalizedNumbers.length; index += 1) {
+        const drawNumber = drawNumbers.find(number => number.number === normalizedNumbers[index]);
+        if (!drawNumber) throw new Error('Every lucky number must exist on the wheel');
         await DrawNumber.update(
           {
             is_lucky: true,
@@ -115,8 +104,8 @@ class DrawService {
         );
       }
 
-      draw.lucky_user_ids = normalizedIds;
-      draw.lucky_spin_count = normalizedIds.length;
+      draw.lucky_user_ids = normalizedNumbers;
+      draw.lucky_spin_count = normalizedNumbers.length;
       draw.status = 'READY';
       await draw.save({ transaction });
 
@@ -140,20 +129,12 @@ class DrawService {
       if (!draw.is_active) throw new Error('Draw is deactivated');
       if (draw.status !== 'READY') throw new Error('Draw is not ready to start');
 
-      const participantCount = await User.count({
-        where: { role: 'USER', status: 'ACTIVE' },
-        transaction,
-      });
       const existingResults = await DrawResult.count({
         where: { draw_id: drawId },
         transaction,
       });
       if (existingResults === 0) {
-        await DrawNumber.destroy({
-          where: { draw_id: drawId, number: { [Op.gt]: participantCount } },
-          transaction,
-        });
-        draw.max_number = participantCount;
+        draw.max_number = draw.draw_number;
       }
 
       draw.status = 'IN_PROGRESS';
@@ -192,21 +173,18 @@ class DrawService {
       if (!draw.is_active) throw new Error('Draw is deactivated');
       if (draw.status !== 'IN_PROGRESS') throw new Error('Draw is not in progress');
 
-      const participants = await User.findAll({
-        where: { role: 'USER', status: 'ACTIVE' },
-        attributes: ['id', 'full_name', 'email'],
-        order: [['id', 'ASC']],
-        transaction,
-      });
       const previousResults = await DrawResult.findAll({
         where: { draw_id: drawId },
-        attributes: ['user_id', 'selection_type'],
+        attributes: ['draw_number_id', 'selection_type'],
         transaction,
       });
-      const previousUserIds = new Set(previousResults.map(result => String(result.user_id)).filter(Boolean));
-      const remainingParticipants = participants.filter(user => !previousUserIds.has(String(user.id)));
+      const previousNumberIds = new Set(previousResults.map(result => String(result.draw_number_id)));
 
-      if (remainingParticipants.length === 0) {
+      const remainingNumbers = await DrawNumber.findAll({
+        where: { draw_id: drawId, status: { [Op.in]: ['ELIGIBLE', 'LUCKY'] } },
+        transaction,
+      });
+      if (remainingNumbers.length === 0) {
         // All done
         draw.status = 'COMPLETED';
         draw.completed_at = new Date();
@@ -216,20 +194,17 @@ class DrawService {
       }
 
       let selectedNumber;
-      let selectedUser;
-
       const luckyUserIds = Array.isArray(draw.lucky_user_ids) ? draw.lucky_user_ids : [];
-      const pendingLuckyUserId = luckyUserIds
-        .map(id => String(id))
-        .find(id => !previousUserIds.has(id));
+      const pendingLuckyNumber = luckyUserIds.find(number => {
+        const candidate = remainingNumbers.find(item => item.number === Number(number));
+        return candidate && !previousNumberIds.has(String(candidate.id));
+      });
 
-      if (pendingLuckyUserId) {
-        selectedUser = remainingParticipants.find(
-          user => String(user.id) === pendingLuckyUserId
-        );
+      if (pendingLuckyNumber) {
         selectedNumber = await DrawNumber.findOne({
           where: {
             draw_id: drawId,
+            number: Number(pendingLuckyNumber),
             status: 'LUCKY',
             is_lucky: true,
           },
@@ -237,11 +212,11 @@ class DrawService {
           transaction,
         });
 
-        if (!selectedUser || !selectedNumber) {
-          throw new Error('A configured lucky user or lucky number is unavailable');
+        if (!selectedNumber) {
+          throw new Error('A configured lucky number is unavailable');
         }
       } else {
-        // Lucky users are exhausted; only then choose from the remaining users randomly.
+        // Lucky numbers are exhausted; choose from the remaining wheel numbers randomly.
         selectedNumber = await DrawNumber.findOne({
           where: {
             draw_id: drawId,
@@ -250,7 +225,6 @@ class DrawService {
           order: sequelize.random(),
           transaction,
         });
-        selectedUser = remainingParticipants[Math.floor(Math.random() * remainingParticipants.length)];
       }
 
       if (!selectedNumber) {
@@ -266,7 +240,7 @@ class DrawService {
       const result = await DrawResult.create({
         draw_id: drawId,
         draw_number_id: selectedNumber.id,
-        user_id: selectedUser.id,
+        user_id: null,
         number: selectedNumber.number,
         position: draw.current_spin + 1,
         selection_type: selectedNumber.is_lucky ? 'LUCKY' : 'RANDOM',
@@ -282,10 +256,10 @@ class DrawService {
 
       return {
         number: selectedNumber.number,
-        user: selectedUser,
+        user: null,
         isLucky: selectedNumber.is_lucky,
         spinNumber: draw.current_spin,
-        totalSpins: participants.length,
+        totalSpins: draw.max_number,
       };
     } catch (error) {
       await transaction.rollback();
@@ -380,7 +354,6 @@ class DrawService {
       winners,
       remaining,
       totalNumbers: draw.numbers.length,
-      totalUsers: await User.count({ where: { role: 'USER', status: 'ACTIVE' } }),
       totalWinners: draw.total_winners,
       isComplete: draw.status === 'COMPLETED',
       isInProgress: draw.status === 'IN_PROGRESS',

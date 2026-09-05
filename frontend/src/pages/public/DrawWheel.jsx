@@ -4,8 +4,7 @@ import {
   Wheel, 
   WheelStatus, 
   WinnerDisplay, 
-  WinnerHistory,
-  SpinButton 
+  WinnerHistory
 } from '../../components/wheel';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
@@ -65,13 +64,13 @@ const DrawWheel = () => {
       
       const winnerNumbers = drawWinners.map(w => w.number);
       setWinners(winnerNumbers);
-      setWheelWinners(drawWinners.map(w => w.position));
+      setWheelWinners(drawWinners.map(w => w.number));
 
-      setTotalParticipants(data.totalUsers || 0);
+      setTotalParticipants(data.totalNumbers || 0);
       setNumbers(Array.from(
-        { length: data.totalUsers || 0 },
+        { length: data.totalNumbers || 0 },
         (_, index) => index + 1
-      ).filter(slot => !drawWinners.some(winner => winner.position === slot)));
+      ));
 
       // Check if draw is complete
       if (data.isComplete && status !== 'COMPLETED') {
@@ -110,7 +109,7 @@ const DrawWheel = () => {
         return;
       }
 
-      setCurrentWinner(data.user || { id: null, full_name: `User ${data.number}`, number: data.number });
+      setCurrentWinner(data.user || { id: null, full_name: `Number ${data.number}`, number: data.number });
       
       // Add to winners
       setWinners(prev => [...prev, data.number]);
@@ -122,9 +121,6 @@ const DrawWheel = () => {
         position: prev.length + 1,
         user: data.user,
       }]);
-
-      // Update numbers
-      setNumbers(prev => prev.filter(slot => slot !== data.spinNumber));
 
       // Update draw status
       if (data.completed) {
@@ -266,12 +262,7 @@ const DrawWheel = () => {
                   🚀 Start Draw
                 </Button>
               ) : status === 'IN_PROGRESS' ? (
-                <SpinButton
-                  onClick={handleSpin}
-                  disabled={isSpinning}
-                  isSpinning={isSpinning}
-                  label="SPIN"
-                />
+                <span className="text-sm text-gray-500">Use the wheel to spin</span>
               ) : (
                 <div className="text-sm text-gray-500">
                   {status === 'COMPLETED' ? '🎉 Draw completed!' : '⏳ Waiting for draw to be configured...'}

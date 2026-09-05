@@ -67,12 +67,12 @@ const WheelStatus = ({
       <div className={`grid grid-cols-2 ${showLuckyCount ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-3`}>
         <div className="bg-white rounded-lg border border-gray-200 p-3 text-center">
           <p className="text-xl font-bold text-gray-900">{totalParticipants || 0}</p>
-          <p className="text-xs text-gray-500">Total Users</p>
+          <p className="text-xs text-gray-500">Draw Numbers</p>
         </div>
         {showLuckyCount && (
           <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-3 text-center">
             <p className="text-xl font-bold text-yellow-700">{luckyCount || 0}</p>
-            <p className="text-xs text-yellow-600">⭐ Lucky Users</p>
+            <p className="text-xs text-yellow-600">⭐ Lucky Numbers</p>
           </div>
         )}
         <div className="bg-green-50 rounded-lg border border-green-200 p-3 text-center">

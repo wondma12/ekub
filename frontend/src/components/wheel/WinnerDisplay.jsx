@@ -54,7 +54,7 @@ const WinnerDisplay = ({ winners, currentWinner, totalParticipants, results = []
                     #{index + 1}
                   </span>
                   <span className="font-bold text-gray-700">
-                    {results.find(result => result.number === winner)?.user?.full_name || `User ${winner}`}
+                    {results.find(result => result.number === winner)?.user?.full_name || `Number ${winner}`}
                   </span>
                   {results.find(result => result.number === winner)?.user?.id && (
                     <span className="text-xs text-gray-500">

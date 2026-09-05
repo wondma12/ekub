@@ -4,8 +4,7 @@ import {
   Wheel, 
   WheelStatus, 
   WinnerDisplay, 
-  WinnerHistory,
-  SpinButton 
+  WinnerHistory
 } from '../../components/wheel';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
@@ -28,7 +27,6 @@ const DrawManagement = () => {
   const [error, setError] = useState(null);
   const [showLuckyModal, setShowLuckyModal] = useState(false);
   const [selectedLucky, setSelectedLucky] = useState([]);
-  const [availableUsers, setAvailableUsers] = useState([]);
   const [results, setResults] = useState([]);
 
   useEffect(() => {
@@ -36,21 +34,6 @@ const DrawManagement = () => {
       fetchDrawStatus();
     }
   }, [drawId]);
-
-  useEffect(() => {
-    if (drawId && showLuckyModal) {
-      fetchAvailableUsers();
-    }
-  }, [drawId, showLuckyModal]);
-
-  const fetchAvailableUsers = async () => {
-    try {
-      const users = await drawService.getAvailableUsers(drawId);
-      setAvailableUsers(users || []);
-    } catch (err) {
-      setError(err.message || 'Failed to fetch users');
-    }
-  };
 
   const fetchDrawStatus = async () => {
     try {
@@ -66,13 +49,13 @@ const DrawManagement = () => {
       setSelectedLucky(luckyUserIds);
       setResults(drawWinners);
       setWinners(drawWinners.map(w => w.number));
-      setWheelWinners(drawWinners.map(w => w.position));
+      setWheelWinners(drawWinners.map(w => w.number));
 
-      setTotalParticipants(data.totalUsers || 0);
+      setTotalParticipants(data.totalNumbers || 0);
       setNumbers(Array.from(
-        { length: data.totalUsers || 0 },
+        { length: data.totalNumbers || 0 },
         (_, index) => index + 1
-      ).filter(slot => !drawWinners.some(winner => winner.position === slot)));
+      ));
 
     } catch (err) {
       setError(err.message || 'Failed to fetch draw status');
@@ -100,7 +83,7 @@ const DrawManagement = () => {
         return;
       }
 
-      setCurrentWinner(data.user || { id: null, full_name: `User ${data.number}`, number: data.number });
+      setCurrentWinner(data.user || { id: null, full_name: `Number ${data.number}`, number: data.number });
       
       // Add to winners
       setWinners(prev => [...prev, data.number]);
@@ -112,9 +95,6 @@ const DrawManagement = () => {
         position: prev.length + 1,
         user: data.user,
       }]);
-
-      // Update numbers
-      setNumbers(prev => prev.filter(slot => slot !== data.spinNumber));
 
       // Update draw status
       if (data.completed) {
@@ -265,12 +245,6 @@ const DrawManagement = () => {
               size={500}
             />
             <div className="mt-4 flex items-center gap-4">
-              <SpinButton
-                onClick={handleSpin}
-                disabled={status !== 'IN_PROGRESS' || isSpinning}
-                isSpinning={isSpinning}
-                label={status === 'IN_PROGRESS' ? 'SPIN' : 'Draw Not Started'}
-              />
               {currentWinner && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <span className="text-2xl font-bold text-green-600">
@@ -283,7 +257,7 @@ const DrawManagement = () => {
               )}
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              {winners.length} of {totalParticipants} users selected
+              {winners.length} of {totalParticipants} draw numbers selected
             </p>
           </div>
         </div>
@@ -341,19 +315,18 @@ const DrawManagement = () => {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Select up to 7 active registered users. These lucky users will be picked first in the draw.
+              Select up to 7 wheel numbers. These lucky numbers will be picked first in the draw.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
-            {availableUsers.map((user) => {
-              const userId = Number(user.id);
-              const isSelected = selectedLucky.includes(userId);
-              const isLucky = luckyNumbers.includes(userId);
+            {Array.from({ length: totalParticipants }, (_, index) => index + 1).map((number) => {
+              const isSelected = selectedLucky.includes(number);
+              const isLucky = luckyNumbers.includes(number);
 
               return (
                 <button
-                  key={user.id}
+                  key={number}
                   type="button"
-                  onClick={() => toggleLuckyUser(user.id)}
+                  onClick={() => toggleLuckyUser(number)}
                   disabled={isLucky && !isSelected}
                   className={`
                     w-full flex items-center justify-between rounded-xl border px-3 py-2 text-left transition-all duration-200
@@ -368,8 +341,8 @@ const DrawManagement = () => {
                   `}
                 >
                   <div>
-                    <div className="font-semibold">{user.full_name}</div>
-                    <div className="text-xs opacity-75">User ID: {user.id}</div>
+                    <div className="font-semibold">Number {number}</div>
+                    <div className="text-xs opacity-75">Wheel draw number</div>
                   </div>
                   <span className="text-lg">{isSelected ? '⭐' : ''}</span>
                 </button>
