@@ -141,3 +141,12 @@ export const deleteDraw = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
+
+export const setDrawActive = async (req, res) => {
+  try {
+    const draw = await drawService.setDrawActive(req.params.drawId, req.body.is_active);
+    res.json({ success: true, data: draw });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};

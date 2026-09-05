@@ -30,6 +30,15 @@ export const drawService = {
     }
   },
 
+  setDrawActive: async (drawId, isActive) => {
+    try {
+      const response = await api.patch(`/draws/${drawId}/active`, { is_active: isActive });
+      return response.data.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to update draw activity');
+    }
+  },
+
   /**
    * Set lucky numbers for a draw
    */

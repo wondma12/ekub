@@ -21,7 +21,6 @@ const DrawWheel = () => {
   const [draw, setDraw] = useState(null);
   const [numbers, setNumbers] = useState([]);
   const [wheelWinners, setWheelWinners] = useState([]);
-  const [wheelLuckyNumbers, setWheelLuckyNumbers] = useState([]);
   const [winners, setWinners] = useState([]);
   const [luckyNumbers, setLuckyNumbers] = useState([]);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -33,6 +32,7 @@ const DrawWheel = () => {
   const [totalParticipants, setTotalParticipants] = useState(0);
 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'JUDGE';
+  const isDrawActive = draw?.is_active !== false;
 
   useEffect(() => {
     if (drawId) {
@@ -61,7 +61,6 @@ const DrawWheel = () => {
       setDraw(data.draw);
       setStatus(data.draw.status);
       setLuckyNumbers(data.luckyNumbers || []);
-      setWheelLuckyNumbers((data.luckyUserIds || data.draw?.lucky_user_ids || []).map((_, index) => index + 1));
       setResults(drawWinners);
       
       const winnerNumbers = drawWinners.map(w => w.number);
@@ -89,6 +88,10 @@ const DrawWheel = () => {
   };
 
   const handleSpin = async () => {
+    if (!isDrawActive) {
+      setError('This draw is deactivated and cannot spin');
+      return;
+    }
     if (status !== 'IN_PROGRESS') {
       setError('Start the draw before spinning');
       return;
@@ -142,6 +145,10 @@ const DrawWheel = () => {
   };
 
   const handleStartDraw = async () => {
+    if (!isDrawActive) {
+      setError('This draw is deactivated and cannot start');
+      return;
+    }
     try {
       setError(null);
       await drawService.startDraw(drawId);
@@ -236,18 +243,21 @@ const DrawWheel = () => {
             <Wheel
               numbers={numbers}
               winners={wheelWinners}
-              luckyNumbers={wheelLuckyNumbers}
               onSpinComplete={(winner) => {
                 // Winner is already handled in handleSpin
               }}
               isSpinning={isSpinning}
-              disabled={status !== 'IN_PROGRESS'}
+              disabled={!isDrawActive || status !== 'IN_PROGRESS'}
               onSpin={handleSpin}
               size={Math.min(500, window.innerWidth - 100)}
             />
             
             <div className="mt-4 flex flex-col items-center gap-3">
-              {status === 'READY' ? (
+              {!isDrawActive ? (
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                  <span aria-hidden="true">⛔</span> Draw deactivated: spinning is disabled
+                </div>
+              ) : status === 'READY' ? (
                 <Button
                   variant="success"
                   onClick={handleStartDraw}
@@ -276,9 +286,7 @@ const DrawWheel = () => {
                     {currentWinner.id && (
                       <p className="text-sm text-green-600">User ID: {currentWinner.id}</p>
                     )}
-                    <p className="text-xs text-green-500 mt-1">
-                      {luckyNumbers.includes(currentWinner.number) ? '⭐ Lucky' : '🎲 Random'}
-                    </p>
+                    <p className="text-xs text-green-500 mt-1">Selected</p>
                   </div>
                 </div>
               )}
@@ -310,7 +318,6 @@ const DrawWheel = () => {
           <WinnerDisplay
             winners={winners}
             currentWinner={currentWinner}
-            luckyNumbers={luckyNumbers}
             totalParticipants={totalParticipants}
             results={results}
           />
@@ -329,8 +336,8 @@ const DrawWheel = () => {
                 <span className="font-medium">#{draw.draw_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Lucky Users</span>
-                <span className="font-medium">{draw?.lucky_user_ids?.length || luckyNumbers.length}</span>
+                <span className="text-gray-500">Participants</span>
+                <span className="font-medium">{totalParticipants}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Created By</span>

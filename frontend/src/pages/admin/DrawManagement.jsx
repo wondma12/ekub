@@ -18,7 +18,6 @@ const DrawManagement = () => {
   const [draw, setDraw] = useState(null);
   const [numbers, setNumbers] = useState([]);
   const [wheelWinners, setWheelWinners] = useState([]);
-  const [wheelLuckyNumbers, setWheelLuckyNumbers] = useState([]);
   const [totalParticipants, setTotalParticipants] = useState(0);
   const [winners, setWinners] = useState([]);
   const [luckyNumbers, setLuckyNumbers] = useState([]);
@@ -64,7 +63,6 @@ const DrawManagement = () => {
       setStatus(data.draw.status);
       const luckyUserIds = (data.luckyUserIds || data.draw?.lucky_user_ids || []).map(id => Number(id));
       setLuckyNumbers(data.luckyNumbers || []);
-      setWheelLuckyNumbers(luckyUserIds.map((_, index) => index + 1));
       setSelectedLucky(luckyUserIds);
       setResults(drawWinners);
       setWinners(drawWinners.map(w => w.number));
@@ -258,7 +256,6 @@ const DrawManagement = () => {
             <Wheel
               numbers={numbers}
               winners={wheelWinners}
-              luckyNumbers={wheelLuckyNumbers}
               onSpinComplete={(winner) => {
                 // Winner is already handled in handleSpin
               }}
@@ -301,12 +298,12 @@ const DrawManagement = () => {
             remainingCount={Math.max(totalParticipants - winners.length, 0)}
             currentSpin={winners.length}
             totalSpins={totalParticipants}
+            showLuckyCount={false}
           />
 
           <WinnerDisplay
             winners={winners}
             currentWinner={currentWinner}
-            luckyNumbers={luckyNumbers}
             totalParticipants={totalParticipants}
             results={results}
           />

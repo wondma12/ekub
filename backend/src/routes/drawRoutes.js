@@ -14,6 +14,7 @@ import {
   getAvailableUsers,
   updateDraw,
   deleteDraw,
+  setDrawActive,
 } from '../controllers/drawController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { roleMiddleware } from '../middleware/roleMiddleware.js';
@@ -44,6 +45,7 @@ router.post('/:drawId/cancel', cancelDraw);
 router.post('/:drawId/reset', resetDraw);
 router.get('/:drawId/available-users', getAvailableUsers);
 router.put('/:drawId', updateDraw);
+router.patch('/:drawId/active', setDrawActive);
 router.delete('/:drawId', deleteDraw);
 
 export default router;

@@ -137,6 +137,7 @@ class DrawService {
     try {
       const draw = await Draw.findByPk(drawId);
       if (!draw) throw new Error('Draw not found');
+      if (!draw.is_active) throw new Error('Draw is deactivated');
       if (draw.status !== 'READY') throw new Error('Draw is not ready to start');
 
       const participantCount = await User.count({
@@ -188,6 +189,7 @@ class DrawService {
     try {
       const draw = await Draw.findByPk(drawId);
       if (!draw) throw new Error('Draw not found');
+      if (!draw.is_active) throw new Error('Draw is deactivated');
       if (draw.status !== 'IN_PROGRESS') throw new Error('Draw is not in progress');
 
       const participants = await User.findAll({
@@ -443,6 +445,15 @@ class DrawService {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  async setDrawActive(drawId, isActive) {
+    const draw = await Draw.findByPk(drawId);
+    if (!draw) throw new Error('Draw not found');
+
+    draw.is_active = Boolean(isActive);
+    await draw.save();
+    return draw;
   }
 
   async getAllDraws() {

@@ -20,6 +20,13 @@ const ensureDrawSchemaCompatibility = async () => {
     );
     console.log('✅ Added missing draws.lucky_user_ids column');
   }
+
+  if (!tableDescription.is_active) {
+    await sequelize.query(
+      'ALTER TABLE "draws" ADD COLUMN IF NOT EXISTS "is_active" BOOLEAN NOT NULL DEFAULT TRUE;'
+    );
+    console.log('✅ Added missing draws.is_active column');
+  }
 };
 
 const seedDefaultData = async () => {

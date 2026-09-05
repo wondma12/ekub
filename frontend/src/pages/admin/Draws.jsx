@@ -74,6 +74,23 @@ const Draws = () => {
     return icons[status] || '📌';
   };
 
+  const getActivityState = (draw) => {
+    const isActive = draw.is_active !== false;
+    return {
+      label: isActive ? 'Active' : 'Deactivated',
+      className: isActive ? 'text-green-700 bg-green-50 border-green-200' : 'text-gray-600 bg-gray-100 border-gray-200',
+      icon: isActive ? (
+        <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.172 7.707 8.879a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      ) : (
+        <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        </svg>
+      ),
+    };
+  };
+
   const formatDate = (date) => {
     return new Date(date).toLocaleString('en-US', {
       year: 'numeric',
@@ -146,6 +163,19 @@ const Draws = () => {
     }
   };
 
+  const handleToggleDraw = async (draw) => {
+    const nextState = draw.is_active === false;
+    const action = nextState ? 'activate' : 'deactivate';
+    if (!window.confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} ${draw.title || `Draw #${draw.draw_number}`}?`)) return;
+
+    try {
+      await drawService.setDrawActive(draw.id, nextState);
+      await fetchDraws();
+    } catch (err) {
+      setError(err.message || 'Failed to update draw activity');
+    }
+  };
+
   const DrawCard = ({ draw }) => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
@@ -153,6 +183,19 @@ const Draws = () => {
           <div className="flex items-center gap-2">
             <span className="text-lg">{getStatusIcon(draw.status)}</span>
             <h3 className="font-semibold text-gray-900">{draw.title || `Draw #${draw.draw_number}`}</h3>
+            {(() => {
+              const activity = getActivityState(draw);
+              return (
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-semibold ${activity.className}`}
+                  title={`${activity.label} draw`}
+                  aria-label={`${activity.label} draw`}
+                >
+                  {activity.icon}
+                  {activity.label}
+                </span>
+              );
+            })()}
             <span className={`badge ${getStatusBadge(draw.status)}`}>
               {draw.status}
             </span>
@@ -211,6 +254,13 @@ const Draws = () => {
           )}
           <Button size="sm" variant="outline-danger" onClick={() => handleDeleteDraw(draw)}>
             Delete
+          </Button>
+          <Button
+            size="sm"
+            variant={draw.is_active === false ? 'outline-success' : 'outline-secondary'}
+            onClick={() => handleToggleDraw(draw)}
+          >
+            {draw.is_active === false ? 'Activate' : 'Deactivate'}
           </Button>
           <Button
             size="sm"

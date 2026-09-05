@@ -46,14 +46,8 @@ const WinnerHistory = ({ results, maxDisplay = 20 }) => {
                       {result.user?.id && <span className="block text-xs font-normal text-gray-500">ID: {result.user.id}</span>}
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`
-                        inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-                        ${result.selection_type === 'LUCKY' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-blue-100 text-blue-800'
-                        }
-                      `}>
-                        {result.selection_type === 'LUCKY' ? '⭐ Lucky' : '🎲 Random'}
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Selected
                       </span>
                     </td>
                     <td className="px-3 py-2 text-gray-400 text-xs">#{result.spin_number}</td>

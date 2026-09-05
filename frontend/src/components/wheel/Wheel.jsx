@@ -6,7 +6,6 @@ const Wheel = ({
   onSpinComplete, 
   isSpinning, 
   onSpin,
-  luckyNumbers = [],
   size = 500,
   disabled = false,
 }) => {
@@ -24,7 +23,7 @@ const Wheel = ({
 
   useEffect(() => {
     drawWheel();
-  }, [numbers, winners, luckyNumbers, rotation]);
+  }, [numbers, winners, rotation]);
 
   const drawWheel = () => {
     const canvas = canvasRef.current;
@@ -52,7 +51,6 @@ const Wheel = ({
       const endAngle = startAngle + sliceAngle;
 
       const isWinner = winners.includes(num);
-      const isLucky = luckyNumbers.includes(num);
       const colorIndex = index % colors.length;
 
       // Draw slice
@@ -65,10 +63,6 @@ const Wheel = ({
         ctx.fillStyle = '#28a745';
         ctx.shadowColor = 'rgba(40, 167, 69, 0.5)';
         ctx.shadowBlur = 20;
-      } else if (isLucky) {
-        ctx.fillStyle = '#ffd700';
-        ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-        ctx.shadowBlur = 15;
       } else {
         ctx.fillStyle = colors[colorIndex];
         ctx.shadowColor = 'transparent';
@@ -90,9 +84,6 @@ const Wheel = ({
       if (isWinner) {
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 20px Arial';
-      } else if (isLucky) {
-        ctx.fillStyle = '#333';
-        ctx.font = 'bold 18px Arial';
       } else {
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 16px Arial';
@@ -100,19 +91,6 @@ const Wheel = ({
       
       ctx.fillText(num, radius * 0.65, 0);
       ctx.restore();
-
-      // Draw lucky star
-      if (isLucky && !isWinner) {
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(startAngle + sliceAngle / 2);
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#FFD700';
-        ctx.fillText('⭐', radius * 0.85, 0);
-        ctx.restore();
-      }
 
       // Draw winner crown
       if (isWinner) {

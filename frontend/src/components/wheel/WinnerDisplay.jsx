@@ -1,7 +1,6 @@
 import React from 'react';
 
-const WinnerDisplay = ({ winners, currentWinner, luckyNumbers, totalParticipants, results = [] }) => {
-  const currentWinnerNumber = currentWinner?.number ?? currentWinner;
+const WinnerDisplay = ({ winners, currentWinner, totalParticipants, results = [] }) => {
   return (
     <div className="space-y-4">
       {/* Current Winner */}
@@ -18,9 +17,7 @@ const WinnerDisplay = ({ winners, currentWinner, luckyNumbers, totalParticipants
               )}
             </div>
             <div className="text-right">
-              <p className="text-sm text-green-600">
-                {luckyNumbers.includes(currentWinnerNumber) ? '⭐ Lucky' : '🎲 Random'}
-              </p>
+              <p className="text-sm text-green-600">Selected</p>
               <p className="text-xs text-green-500 mt-1">
                 Winner #{winners.length}
               </p>
@@ -51,13 +48,7 @@ const WinnerDisplay = ({ winners, currentWinner, luckyNumbers, totalParticipants
               {winners.map((winner, index) => (
                 <div
                   key={index}
-                  className={`
-                    flex items-center gap-2 px-3 py-2 rounded-lg
-                    ${luckyNumbers.includes(winner) 
-                      ? 'bg-yellow-50 border border-yellow-200' 
-                      : 'bg-gray-50 border border-gray-100'
-                    }
-                  `}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-100"
                 >
                   <span className="text-xs text-gray-400 font-medium">
                     #{index + 1}
@@ -69,9 +60,6 @@ const WinnerDisplay = ({ winners, currentWinner, luckyNumbers, totalParticipants
                     <span className="text-xs text-gray-500">
                       ID: {results.find(result => result.number === winner).user.id}
                     </span>
-                  )}
-                  {luckyNumbers.includes(winner) && (
-                    <span className="text-xs">⭐</span>
                   )}
                 </div>
               ))}

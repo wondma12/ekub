@@ -219,6 +219,8 @@ CREATE TABLE draws (
 
     status draw_status NOT NULL DEFAULT 'DRAFT',
 
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
     min_number INTEGER NOT NULL DEFAULT 1,
 
     max_number INTEGER NOT NULL DEFAULT 80,

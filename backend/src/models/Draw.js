@@ -26,6 +26,11 @@ const Draw = sequelize.define('Draw', {
     type: DataTypes.ENUM('DRAFT', 'READY', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'),
     defaultValue: 'DRAFT',
   },
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
   min_number: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
