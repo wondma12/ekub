@@ -19,18 +19,6 @@ const statusIcons = {
   CANCELLED: '❌',
 };
 
-const StatIcon = ({ type }) => {
-  if (type === 'draws') {
-    return <span className="home-stat-icon home-stat-icon-teal" aria-hidden="true">◎</span>;
-  }
-
-  if (type === 'lucky') {
-    return <span className="home-stat-icon home-stat-icon-coral" aria-hidden="true">✦</span>;
-  }
-
-  return <span className="home-stat-icon home-stat-icon-gold" aria-hidden="true">♛</span>;
-};
-
 const Home = () => {
   const { user } = useAuth();
   const [draws, setDraws] = useState([]);
@@ -58,9 +46,6 @@ const Home = () => {
     day: 'numeric',
   });
 
-  const luckyUsers = draws.reduce((total, draw) => total + (draw.lucky_user_ids?.length || 0), 0);
-  const winners = draws.reduce((total, draw) => total + (draw.total_winners || 0), 0);
-
   return (
     <div className="home-page">
       <header className="home-header">
@@ -77,35 +62,6 @@ const Home = () => {
       </header>
 
       <main>
-        <section className="home-hero">
-          <div className="home-hero-copy">
-            <p className="home-kicker"><span /> THE DRAW ROOM</p>
-            <h1>Good fortune,<br /><em>made visible.</em></h1>
-            <p className="home-hero-text">A clear, shared view of every  selection OF  winner. Step inside and follow the story of each draw.</p>
-            <div className="home-hero-actions">
-              <a href="#draws" className="home-primary-action">Explore the draws <span aria-hidden="true">↓</span></a>
-              <span className="home-hero-caption">Open records · Live results</span>
-            </div>
-          </div>
-          <div className="home-hero-art" aria-hidden="true">
-            <div className="home-sun" />
-            <div className="home-ticket home-ticket-back"><span>EKUB</span></div>
-            <div className="home-ticket home-ticket-front">
-              <span className="home-ticket-label">NEXT MOMENT</span>
-              <strong>YOUR<br />WINNER<br /><i>AWAITS</i></strong>
-              <span className="home-ticket-star">✦</span>
-            </div>
-            <span className="home-art-note home-art-note-top">01 / OPEN</span>
-            <span className="home-art-note home-art-note-bottom">SHARE THE JOY</span>
-          </div>
-        </section>
-
-        <section className="home-stats" aria-label="Draw overview">
-          <div><StatIcon type="draws" /><span><strong>{draws.length}</strong> published {draws.length === 1 ? 'draw' : 'draws'}</span></div>
-          {/* <div><StatIcon type="lucky" /><span><strong>{luckyUsers}</strong> RANDOM {luckyUsers === 1 ? 'person' : 'people'}</span></div> */}
-          <div><StatIcon type="winners" /><span><strong>{winners}</strong> {winners === 1 ? 'winner' : 'winners'} celebrated</span></div>
-        </section>
-
         <section className="home-draws-section" id="draws">
           <div className="home-section-heading">
             <div>
