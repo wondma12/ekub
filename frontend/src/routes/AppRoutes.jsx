@@ -20,6 +20,7 @@ import Draws from '../pages/admin/Draws';
 import DrawManagement from '../pages/admin/DrawManagement';
 import CreateDraw from '../pages/admin/CreateDraw';
 import Ekubs from '../pages/admin/Ekubs';
+import Settings from '../pages/admin/Settings';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRoles = [] }) => {
@@ -133,6 +134,14 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRoles={['ADMIN', 'JUDGE']}>
           <Layout>
             <Ekubs />
+          </Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/settings" element={
+        <ProtectedRoute requiredRoles={['ADMIN', 'JUDGE']}>
+          <Layout>
+            <Settings />
           </Layout>
         </ProtectedRoute>
       } />

@@ -13,7 +13,7 @@ const WheelStatus = ({
   const getStatusConfig = () => {
     const configs = {
       DRAFT: {
-        label: 'Draft - Set Lucky Numbers',
+        label: 'Draft',
         color: 'bg-yellow-100 text-yellow-800',
         icon: '📝',
         progress: 0,
@@ -98,16 +98,6 @@ const WheelStatus = ({
               style={{ width: `${Math.min(statusConfig.progress, 100)}%` }}
             />
           </div>
-        </div>
-      )}
-
-      {/* Status Messages */}
-      {status === 'DRAFT' && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-          <p className="flex items-center gap-2">
-            <span>💡</span>
-            Select lucky numbers and then start the draw
-          </p>
         </div>
       )}
 

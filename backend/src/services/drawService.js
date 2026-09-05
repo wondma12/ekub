@@ -127,7 +127,11 @@ class DrawService {
       const draw = await Draw.findByPk(drawId);
       if (!draw) throw new Error('Draw not found');
       if (!draw.is_active) throw new Error('Draw is deactivated');
-      if (draw.status !== 'READY') throw new Error('Draw is not ready to start');
+      const luckyNumbers = Array.isArray(draw.lucky_user_ids) ? draw.lucky_user_ids : [];
+      const canStartWithoutLuckyNumbers = draw.status === 'DRAFT' && luckyNumbers.length === 0;
+      if (draw.status !== 'READY' && !canStartWithoutLuckyNumbers) {
+        throw new Error('Draw is not ready to start');
+      }
 
       const existingResults = await DrawResult.count({
         where: { draw_id: drawId },

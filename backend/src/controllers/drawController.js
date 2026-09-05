@@ -49,6 +49,9 @@ export const getDrawStatus = async (req, res) => {
   try {
     const { drawId } = req.params;
     const status = await drawService.getDrawStatus(drawId);
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.json({ success: true, data: status });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

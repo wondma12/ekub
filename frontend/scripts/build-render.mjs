@@ -8,6 +8,7 @@ const routes = [
   'dashboard',
   'users',
   'ekubs',
+  'settings',
   'draws',
   'draws/new',
 ];

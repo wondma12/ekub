@@ -8,7 +8,6 @@ import {
 } from '../../components/wheel';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
-import Modal from '../../components/common/Modal';
 import { drawService } from '../../services/drawService';
 
 const DrawManagement = () => {
@@ -25,8 +24,6 @@ const DrawManagement = () => {
   const [status, setStatus] = useState('DRAFT');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showLuckyModal, setShowLuckyModal] = useState(false);
-  const [selectedLucky, setSelectedLucky] = useState([]);
   const [results, setResults] = useState([]);
 
   useEffect(() => {
@@ -44,9 +41,7 @@ const DrawManagement = () => {
 
       setDraw(data.draw);
       setStatus(data.draw.status);
-      const luckyUserIds = (data.luckyUserIds || data.draw?.lucky_user_ids || []).map(id => Number(id));
       setLuckyNumbers(data.luckyNumbers || []);
-      setSelectedLucky(luckyUserIds);
       setResults(drawWinners);
       setWinners(drawWinners.map(w => w.number));
       setWheelWinners(drawWinners.map(w => w.number));
@@ -113,17 +108,6 @@ const DrawManagement = () => {
     }
   };
 
-  const handleSetLuckyNumbers = async () => {
-    try {
-      await drawService.setLuckyNumbers(drawId, selectedLucky);
-      setShowLuckyModal(false);
-      setSelectedLucky([]);
-      await fetchDrawStatus();
-    } catch (err) {
-      setError(err.message || 'Failed to set lucky numbers');
-    }
-  };
-
   const handleStartDraw = async () => {
     try {
       await drawService.startDraw(drawId);
@@ -131,33 +115,6 @@ const DrawManagement = () => {
     } catch (err) {
       setError(err.message || 'Failed to start draw');
     }
-  };
-
-  const handleResetDraw = async () => {
-    if (!window.confirm('Are you sure you want to reset this draw? All progress will be lost.')) return;
-    
-    try {
-      await drawService.resetDraw(drawId);
-      await fetchDrawStatus();
-      setWinners([]);
-      setResults([]);
-      setCurrentWinner(null);
-    } catch (err) {
-      setError(err.message || 'Failed to reset draw');
-    }
-  };
-
-  const toggleLuckyUser = (userId) => {
-    const numericId = Number(userId);
-    if (!selectedLucky.includes(numericId) && selectedLucky.length >= 7) {
-      return;
-    }
-
-    setSelectedLucky(prev =>
-      prev.includes(numericId)
-        ? prev.filter(id => id !== numericId)
-        : [...prev, numericId]
-    );
   };
 
   if (loading) {
@@ -185,31 +142,12 @@ const DrawManagement = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          {status === 'DRAFT' && (
-            <Button
-              variant="warning"
-              onClick={() => {
-                setSelectedLucky((draw?.lucky_user_ids || []).map(id => Number(id)));
-                setShowLuckyModal(true);
-              }}
-            >
-              ⭐ Set Lucky Users
-            </Button>
-          )}
-          {status === 'READY' && (
+          {(status === 'READY' || (status === 'DRAFT' && !(draw?.lucky_user_ids || []).length)) && (
             <Button
               variant="success"
               onClick={handleStartDraw}
             >
               🚀 Start Draw
-            </Button>
-          )}
-          {(status === 'IN_PROGRESS' || status === 'READY' || status === 'DRAFT') && (
-            <Button
-              variant="outline-danger"
-              onClick={handleResetDraw}
-            >
-              Reset
             </Button>
           )}
           <Button
@@ -289,71 +227,6 @@ const DrawManagement = () => {
         </div>
       </div>
 
-      {/* Lucky Numbers Modal */}
-      <Modal
-        isOpen={showLuckyModal}
-        onClose={() => setShowLuckyModal(false)}
-        title="⭐ Select Lucky Users"
-        size="lg"
-        actions={
-          <>
-            <Button
-              variant="light"
-              onClick={() => setShowLuckyModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleSetLuckyNumbers}
-              disabled={selectedLucky.length === 0}
-            >
-              Set {selectedLucky.length} Lucky Users
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-              Select up to 7 wheel numbers. These lucky numbers will be picked first in the draw.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
-            {Array.from({ length: totalParticipants }, (_, index) => index + 1).map((number) => {
-              const isSelected = selectedLucky.includes(number);
-              const isLucky = luckyNumbers.includes(number);
-
-              return (
-                <button
-                  key={number}
-                  type="button"
-                  onClick={() => toggleLuckyUser(number)}
-                  disabled={isLucky && !isSelected}
-                  className={`
-                    w-full flex items-center justify-between rounded-xl border px-3 py-2 text-left transition-all duration-200
-                    ${isSelected
-                      ? 'border-yellow-300 bg-yellow-100 text-gray-800 shadow-sm'
-                      : isLucky
-                        ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
-                        : selectedLucky.length >= 7
-                          ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-200 hover:bg-indigo-50'
-                    }
-                  `}
-                >
-                  <div>
-                    <div className="font-semibold">Number {number}</div>
-                    <div className="text-xs opacity-75">Wheel draw number</div>
-                  </div>
-                  <span className="text-lg">{isSelected ? '⭐' : ''}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-sm text-gray-500">
-            Selected: {selectedLucky.length} / 7
-          </p>
-        </div>
-      </Modal>
     </div>
   );
 };

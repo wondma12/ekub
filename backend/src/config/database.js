@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
         rejectUnauthorized: false // For development only
       }
     },
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    logging: process.env.ENABLE_SQL_LOGS === 'true' ? console.log : false,
     pool: {
       max: 5,
       min: 0,

@@ -220,7 +220,7 @@ const Draws = () => {
           </div>
         </div>
         <div className="flex items-center gap-2 ml-4">
-          {draw.status === 'READY' && (
+          {(draw.status === 'DRAFT' || draw.status === 'READY') && (
             <Button
               size="sm"
               variant="success"
