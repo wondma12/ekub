@@ -135,13 +135,13 @@ const Users = () => {
   };
 
   return (
-    <div className="admin-users space-y-6">
+    <div className="admin-users space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="admin-users-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="admin-users-kicker">THE COMMUNITY DIRECTORY</p>
-          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-          <p className="text-sm text-gray-500">Manage all users in the system</p>
+          <p className="admin-users-kicker">Directory</p>
+          <h1 className="text-3xl font-normal text-[#173b3a]">Users</h1>
+          <p className="text-sm text-[#6f8581]">Manage everyone in the Digital Ekub system.</p>
         </div>
         <Button variant="primary" onClick={handleCreateUser}>
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ const Users = () => {
       )}
 
       {/* Filters */}
-      <div className="admin-users-filters bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="admin-users-filters p-4">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <input

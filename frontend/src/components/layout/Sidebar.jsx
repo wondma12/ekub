@@ -118,8 +118,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-16 left-0 bottom-0 z-40
-          w-64 bg-white border-r border-gray-200
+          fixed top-[72px] md:top-[88px] left-0 bottom-0 z-40
+          admin-sidebar w-60 border-r
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
@@ -128,15 +128,16 @@ const Sidebar = ({ isOpen, onClose }) => {
         `}
       >
         {/* Sidebar content */}
-        <div className="flex-1 px-3 py-4 overflow-y-auto">
-          <div className="space-y-1">
+        <div className="flex-1 px-4 py-7 overflow-y-auto">
+          <p className="admin-sidebar-label">Workspace</p>
+          <div className="space-y-1.5">
             {filteredMenuItems.map((item, index) => (
               <NavLinkItem key={index} item={item} />
             ))}
           </div>
 
           {/* Divider */}
-          <hr className="my-4 border-gray-200" />
+          <hr className="my-6 border-[#173b3a]/15" />
 
           {/* Additional section */}
           {/* <div className="space-y-1">
@@ -156,12 +157,12 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer section in sidebar */}
-        <div className="px-3 py-4 border-t border-gray-200">
-          <div className="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
-            <p className="text-xs text-gray-600">
+        <div className="px-4 py-5 border-t border-[#173b3a]/15">
+          <div className="px-3 py-3 bg-[#dcebe7]">
+            <p className="text-xs text-[#173b3a]">
               <span className="font-semibold">Version</span> 1.0.0
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[#6f8581] mt-1">
               © 2026 Digital Ekub
             </p>
           </div>

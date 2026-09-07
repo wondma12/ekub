@@ -177,12 +177,12 @@ const Draws = () => {
   };
 
   const DrawCard = ({ draw }) => (
-    <div className="admin-draw-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+    <div className="admin-draw-card p-5">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="text-lg">{getStatusIcon(draw.status)}</span>
-            <h3 className="font-semibold text-gray-900">{draw.title || `Draw #${draw.draw_number}`}</h3>
+            <h3 className="font-normal text-xl text-[#173b3a]">{draw.title || `Draw #${draw.draw_number}`}</h3>
             {(() => {
               const activity = getActivityState(draw);
               return (
@@ -202,20 +202,20 @@ const Draws = () => {
           </div>
           <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <div>
-              <p className="text-gray-500">Draw Number</p>
-              <p className="font-medium text-gray-700">#{draw.draw_number}</p>
+              <p className="text-[#6f8581]">Draw Number</p>
+              <p className="font-medium text-[#173b3a]">#{draw.draw_number}</p>
             </div>
             <div>
-              <p className="text-gray-500">Winners</p>
-              <p className="font-medium text-gray-700">{draw.total_winners || 0}</p>
+              <p className="text-[#6f8581]">Winners</p>
+              <p className="font-medium text-[#173b3a]">{draw.total_winners || 0}</p>
             </div>
             <div>
-              <p className="text-gray-500">Created</p>
-              <p className="font-medium text-gray-700">{formatDate(draw.created_at)}</p>
+              <p className="text-[#6f8581]">Created</p>
+              <p className="font-medium text-[#173b3a]">{formatDate(draw.created_at)}</p>
             </div>
             <div>
-              <p className="text-gray-500">Created By</p>
-              <p className="font-medium text-gray-700">{draw.creator?.full_name || 'N/A'}</p>
+              <p className="text-[#6f8581]">Created By</p>
+              <p className="font-medium text-[#173b3a]">{draw.creator?.full_name || 'N/A'}</p>
             </div>
           </div>
         </div>
@@ -275,13 +275,13 @@ const Draws = () => {
   );
 
   return (
-    <div className="admin-draws space-y-6">
+    <div className="admin-draws space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="admin-draws-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="admin-draws-kicker">THE DRAW ARCHIVE</p>
-          <h1 className="text-3xl font-bold text-gray-900">Draws</h1>
-          <p className="text-sm text-gray-500">Manage all draws and spin wheels</p>
+          <p className="admin-draws-kicker">The archive</p>
+          <h1 className="text-3xl font-normal text-[#173b3a]">Draws</h1>
+          <p className="text-sm text-[#6f8581]">Manage all draws and spin wheels.</p>
         </div>
         <Button variant="primary" onClick={handleCreateDraw}>
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,8 +299,8 @@ const Draws = () => {
       )}
 
       {editingDraw && (
-        <form onSubmit={handleUpdateDraw} className="bg-white rounded-xl shadow-sm border border-indigo-200 p-4 space-y-3">
-          <h2 className="font-semibold text-gray-900">Edit Draw #{editingDraw.draw_number}</h2>
+        <form onSubmit={handleUpdateDraw} className="admin-draw-edit p-4 space-y-3">
+          <h2 className="font-normal text-xl text-[#173b3a]">Edit Draw #{editingDraw.draw_number}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input
               className="form-input"
@@ -335,7 +335,7 @@ const Draws = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="admin-draw-filters p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <input
@@ -361,7 +361,7 @@ const Draws = () => {
             </select>
             <button
               onClick={fetchDraws}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="admin-draw-apply px-4 py-2 text-white transition-colors"
             >
               Apply
             </button>

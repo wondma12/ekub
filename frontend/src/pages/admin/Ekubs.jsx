@@ -83,11 +83,11 @@ const Ekubs = () => {
 
   return (
     <div className="admin-ekubs space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="admin-ekubs-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="admin-ekubs-kicker">THE COMMUNITY ARCHIVE</p>
-          <h1 className="text-3xl font-bold text-gray-900">Ekubs</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your rotating savings groups.</p>
+          <p className="admin-ekubs-kicker">Collections</p>
+          <h1 className="text-3xl font-normal text-[#173b3a]">Ekubs</h1>
+          <p className="mt-1 text-sm text-[#6f8581]">Manage your rotating savings groups.</p>
         </div>
         <div className="flex gap-3">
           <Button type="button" onClick={() => { closeForm(); setIsFormOpen(true); }}>
@@ -95,7 +95,7 @@ const Ekubs = () => {
           </Button>
           <Link
             to="/draws/new"
-            className="admin-ekubs-secondary inline-flex items-center justify-center px-5 py-2.5 rounded-lg border-2 font-semibold transition-colors"
+            className="admin-ekubs-create-draw inline-flex items-center justify-center px-5 py-2.5 font-semibold transition-colors"
           >
             Create Draw
           </Link>
@@ -105,8 +105,8 @@ const Ekubs = () => {
       {error && <Alert type="error" onDismiss={() => setError(null)}>{error}</Alert>}
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="admin-ekub-form bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Ekub' : 'Create Ekub'}</h2>
+        <form onSubmit={handleSubmit} className="admin-ekubs-form p-6 space-y-4">
+          <h2 className="text-xl font-normal text-[#173b3a]">{editingId ? 'Edit Ekub' : 'Create Ekub'}</h2>
           <input name="name" required maxLength="150" value={form.name} onChange={handleChange} placeholder="Ekub name" className="form-input" />
           <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" rows="3" className="form-input" />
           <input name="contribution_amount" required min="0" step="0.01" type="number" value={form.contribution_amount} onChange={handleChange} placeholder="Contribution amount" className="form-input" />
@@ -119,19 +119,19 @@ const Ekubs = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {ekubs.map((ekub) => (
-          <section key={ekub.id} className="admin-ekub-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <section key={ekub.id} className="admin-ekub-card p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Ekub #{ekub.id}</p>
-                <h2 className="mt-2 text-xl font-bold text-gray-900">{ekub.name}</h2>
-                <p className="mt-1 text-sm text-gray-500">{ekub.description || 'No description provided.'}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#ef765f]">Ekub #{ekub.id}</p>
+                <h2 className="mt-2 text-2xl font-normal text-[#173b3a]">{ekub.name}</h2>
+                <p className="mt-1 text-sm text-[#6f8581]">{ekub.description || 'No description provided.'}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <span className="admin-ekub-status inline-flex items-center px-2.5 py-1 text-xs font-medium">
                 {ekub.status}
               </span>
             </div>
-            <p className="mt-5 text-sm text-gray-500">Contribution</p>
-            <p className="text-lg font-semibold text-gray-900">{Number(ekub.contribution_amount).toFixed(2)}</p>
+            <p className="mt-5 text-sm text-[#6f8581]">Contribution</p>
+            <p className="text-lg font-semibold text-[#0e6b68]">{Number(ekub.contribution_amount).toFixed(2)}</p>
             <div className="mt-5 flex gap-2">
               <Button size="sm" variant="outline-secondary" onClick={() => startEdit(ekub)}>Edit</Button>
               <Button size="sm" variant="outline-danger" onClick={() => handleDelete(ekub)}>Delete</Button>

@@ -22,13 +22,13 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-40 h-16">
-      <div className="flex items-center justify-between h-full px-4">
+    <nav className="admin-navbar fixed top-0 left-0 right-0 z-40 h-[72px] md:h-[88px]">
+      <div className="flex items-center justify-between h-full px-5 md:px-8">
         {/* Left section */}
         <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
+            className="admin-icon-button p-2 lg:hidden"
             aria-label="Toggle sidebar"
           >
             <svg
@@ -46,26 +46,26 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
             </svg>
           </button>
 
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">E</span>
+          <Link to="/" className="admin-brand flex items-center gap-3">
+            <div className="admin-brand-mark">
+              <span>E</span>
             </div>
-            <span className="text-lg font-bold text-gray-900 hidden sm:block">
-              Digital Ekub
+            <span className="hidden text-[17px] font-bold sm:block">
+              Digital <strong>Ekub</strong>
             </span>
           </Link>
         </div>
 
         {/* Center section - search */}
-        <div className="hidden md:flex flex-1 max-w-md mx-4">
+        <div className="hidden md:flex flex-1 max-w-sm mx-8">
           <div className="relative w-full">
             <input
               type="text"
               placeholder="Search..."
-              className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-200 bg-gray-50"
+              className="admin-search w-full px-4 py-2 pl-10 outline-none transition-all duration-200"
             />
             <svg
-              className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+              className="absolute left-3 top-2.5 w-5 h-5 text-[#6f8581]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         {/* Right section */}
         <div className="flex items-center gap-3">
           {/* Notifications */}
-          <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">
+          <button className="admin-icon-button p-2 relative" aria-label="Notifications">
             <svg
               className="w-6 h-6 text-gray-600"
               fill="none"
@@ -104,9 +104,9 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="admin-user-button flex items-center gap-2 p-1.5"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              <div className="admin-avatar w-8 h-8 flex items-center justify-center font-semibold text-sm">
                 {user ? getInitials(user.full_name) : 'U'}
               </div>
               <span className="hidden md:block text-sm font-medium text-gray-700">
@@ -131,13 +131,13 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
 
             {/* Dropdown menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="admin-dropdown absolute right-0 mt-3 w-56 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-200">
                   <p className="text-sm font-semibold text-gray-900">
                     {user?.full_name}
                   </p>
                   <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                  <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                  <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-[#dcebe7] text-[#0e6b68]">
                     {user?.role || 'USER'}
                   </span>
                 </div>

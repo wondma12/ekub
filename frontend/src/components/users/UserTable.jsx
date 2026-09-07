@@ -105,7 +105,7 @@ const UserTable = ({
                 </td>
                 <td>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="admin-user-avatar w-8 h-8 flex items-center justify-center font-semibold text-sm">
                       {user.full_name
                         .split(' ')
                         .map(word => word[0])

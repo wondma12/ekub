@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { drawService } from '../../services/drawService';
+import Footer from '../../components/layout/Footer';
 
 const statusStyles = {
   DRAFT: 'bg-yellow-100 text-yellow-800',
@@ -110,6 +111,7 @@ const Home = () => {
         )}
       </section>
       </main>
+      <Footer />
     </div>
   );
 };

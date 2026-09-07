@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 // Layout Components
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
-import Footer from '../components/layout/Footer';
 
 // Public Pages
 import Home from '../pages/public/Home';
@@ -64,15 +63,14 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="admin-shell min-h-screen">
       <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="lg:ml-64 pt-16">
-        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      <main className="lg:ml-60 pt-[72px] md:pt-[88px]">
+        <div className="p-0 max-w-[1440px] mx-auto">
           {children}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
