@@ -9,6 +9,7 @@ import {
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import { drawService } from '../../services/drawService';
+import { sortUniqueNumbers } from '../../utils/helpers';
 
 const DrawManagement = () => {
   const { drawId } = useParams();
@@ -23,6 +24,7 @@ const DrawManagement = () => {
   const [currentWinner, setCurrentWinner] = useState(null);
   const [status, setStatus] = useState('DRAFT');
   const [loading, setLoading] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
   const [error, setError] = useState(null);
   const [results, setResults] = useState([]);
 
@@ -46,11 +48,11 @@ const DrawManagement = () => {
       setWinners(drawWinners.map(w => w.number));
       setWheelWinners(drawWinners.map(w => w.number));
 
-      setTotalParticipants(data.totalNumbers || 0);
-      setNumbers(Array.from(
-        { length: data.totalNumbers || 0 },
-        (_, index) => index + 1
-      ));
+      const wheelNumbers = sortUniqueNumbers(
+        (data.draw.numbers || []).map(drawNumber => drawNumber.number)
+      );
+      setTotalParticipants(wheelNumbers.length);
+      setNumbers(wheelNumbers);
 
     } catch (err) {
       setError(err.message || 'Failed to fetch draw status');
@@ -78,34 +80,26 @@ const DrawManagement = () => {
         return;
       }
 
-      setCurrentWinner(data.user || { id: null, full_name: `Number ${data.number}`, number: data.number });
-      
-      // Add to winners
-      setWinners(prev => [...prev, data.number]);
-      setWheelWinners(prev => [...prev, data.spinNumber]);
-      setResults(prev => [...prev, {
-        number: data.number,
-        selection_type: data.isLucky ? 'LUCKY' : 'RANDOM',
-        spin_number: data.spinNumber,
-        position: prev.length + 1,
-        user: data.user,
-      }]);
-
-      // Update draw status
-      if (data.completed) {
-        setStatus('COMPLETED');
-      }
-
-      setTimeout(() => {
-        setCurrentWinner(null);
-        setIsSpinning(false);
-        fetchDrawStatus();
-      }, 3000);
+      return data;
 
     } catch (err) {
       setError(err.message || 'Failed to spin wheel');
       setIsSpinning(false);
     }
+  };
+
+  const handleSpinComplete = (number, data) => {
+    setCurrentWinner({ number });
+    setWinners(prev => [...prev, number]);
+    setWheelWinners(prev => [...prev, number]);
+    setResults(prev => [...prev, {
+      number,
+      selection_type: data.isLucky ? 'LUCKY' : 'RANDOM',
+      spin_number: data.spinNumber,
+      position: prev.length + 1,
+      user: data.user,
+    }]);
+    setIsSpinning(false);
   };
 
   const handleStartDraw = async () => {
@@ -114,6 +108,27 @@ const DrawManagement = () => {
       await fetchDrawStatus();
     } catch (err) {
       setError(err.message || 'Failed to start draw');
+    }
+  };
+
+  const handleResetDraw = async () => {
+    const confirmed = window.confirm(
+      'Reset this draw? All selected winners and draw progress will be cleared.'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setIsResetting(true);
+      setError(null);
+      await drawService.resetDraw(drawId);
+      await fetchDrawStatus();
+    } catch (err) {
+      setError(err.message || 'Failed to reset draw');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -142,12 +157,21 @@ const DrawManagement = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline-danger"
+            onClick={handleResetDraw}
+            loading={isResetting}
+            disabled={isSpinning || isResetting}
+          >
+            Reset Draw
+          </Button>
           {(status === 'READY' || (status === 'DRAFT' && !(draw?.lucky_user_ids || []).length)) && (
             <Button
               variant="success"
               onClick={handleStartDraw}
+              disabled={isResetting}
             >
-              🚀 Start Draw
+              🚀 ማሽከርከር ጀምር
             </Button>
           )}
           <Button
@@ -174,9 +198,7 @@ const DrawManagement = () => {
             <Wheel
               numbers={numbers}
               winners={wheelWinners}
-              onSpinComplete={(winner) => {
-                // Winner is already handled in handleSpin
-              }}
+              onSpinComplete={handleSpinComplete}
               isSpinning={isSpinning}
               disabled={status !== 'IN_PROGRESS'}
               onSpin={handleSpin}
@@ -186,11 +208,8 @@ const DrawManagement = () => {
               {currentWinner && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <span className="text-2xl font-bold text-green-600">
-                    🎉 {currentWinner.full_name || `User ${currentWinner.number}`}
+                    🎉 {currentWinner.number}
                   </span>
-                  {currentWinner.id && (
-                    <span className="block text-xs text-green-600">User ID: {currentWinner.id}</span>
-                  )}
                 </div>
               )}
             </div>
@@ -205,7 +224,7 @@ const DrawManagement = () => {
           <WheelStatus
             status={status}
             totalParticipants={totalParticipants}
-            luckyCount={luckyNumbers.length}
+            luckyCount={0}
             winnersCount={winners.length}
             remainingCount={Math.max(totalParticipants - winners.length, 0)}
             currentSpin={winners.length}

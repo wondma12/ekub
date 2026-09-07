@@ -3,14 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Wheel, 
   WheelStatus, 
-  WinnerDisplay, 
-  WinnerHistory
+  WinnerDisplay
 } from '../../components/wheel';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import Loading from '../../components/common/Loading';
 import { drawService } from '../../services/drawService';
 import { useAuth } from '../../context/AuthContext';
+import { sortUniqueNumbers } from '../../utils/helpers';
 
 const DrawWheel = () => {
   const { drawId } = useParams();
@@ -66,11 +66,11 @@ const DrawWheel = () => {
       setWinners(winnerNumbers);
       setWheelWinners(drawWinners.map(w => w.number));
 
-      setTotalParticipants(data.totalNumbers || 0);
-      setNumbers(Array.from(
-        { length: data.totalNumbers || 0 },
-        (_, index) => index + 1
-      ));
+      const wheelNumbers = sortUniqueNumbers(
+        (data.draw.numbers || []).map(drawNumber => drawNumber.number)
+      );
+      setTotalParticipants(wheelNumbers.length);
+      setNumbers(wheelNumbers);
 
       // Check if draw is complete
       if (data.isComplete && status !== 'COMPLETED') {
@@ -109,35 +109,26 @@ const DrawWheel = () => {
         return;
       }
 
-      setCurrentWinner(data.user || { id: null, full_name: `Number ${data.number}`, number: data.number });
-      
-      // Add to winners
-      setWinners(prev => [...prev, data.number]);
-      setWheelWinners(prev => [...prev, data.spinNumber]);
-      setResults(prev => [...prev, {
-        number: data.number,
-        selection_type: data.isLucky ? 'LUCKY' : 'RANDOM',
-        spin_number: data.spinNumber,
-        position: prev.length + 1,
-        user: data.user,
-      }]);
-
-      // Update draw status
-      if (data.completed) {
-        setStatus('COMPLETED');
-      }
-
-      // Clear winner display after delay
-      setTimeout(() => {
-        setCurrentWinner(null);
-        setIsSpinning(false);
-        fetchDrawStatus(false);
-      }, 3000);
+      return data;
 
     } catch (err) {
       setError(err.message || 'Failed to spin wheel');
       setIsSpinning(false);
     }
+  };
+
+  const handleSpinComplete = (number, data) => {
+    setCurrentWinner({ number });
+    setWinners(prev => [...prev, number]);
+    setWheelWinners(prev => [...prev, number]);
+    setResults(prev => [...prev, {
+      number,
+      selection_type: data.isLucky ? 'LUCKY' : 'RANDOM',
+      spin_number: data.spinNumber,
+      position: prev.length + 1,
+      user: data.user,
+    }]);
+    setIsSpinning(false);
   };
 
   const handleStartDraw = async () => {
@@ -193,26 +184,23 @@ const DrawWheel = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen -m-6 p-6 space-y-6 bg-[#101820] text-white">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleBack}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#263746] transition-colors"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-white">
                 {draw.title || `Draw #${draw.draw_number}`}
               </h1>
-              <p className="text-sm text-gray-500">
-                {draw.ekub?.name || 'Ekub'} • Created {new Date(draw.created_at).toLocaleDateString()}
-              </p>
             </div>
           </div>
         </div>
@@ -225,23 +213,18 @@ const DrawWheel = () => {
               🔄 Refresh
             </Button>
           )}
-          <span className="text-sm text-gray-500 self-center">
-            🌐 Public draw mode
-          </span>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Wheel Section */}
-        <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="lg:col-span-3 bg-[#101820] rounded-xl shadow-2xl border border-[#263746] p-6">
           <div className="flex flex-col items-center">
             <Wheel
               numbers={numbers}
               winners={wheelWinners}
-              onSpinComplete={(winner) => {
-                // Winner is already handled in handleSpin
-              }}
+              onSpinComplete={handleSpinComplete}
               isSpinning={isSpinning}
               disabled={!isDrawActive || status !== 'IN_PROGRESS'}
               onSpin={handleSpin}
@@ -269,27 +252,8 @@ const DrawWheel = () => {
                 </div>
               )}
               
-              {currentWinner && (
-                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
-                    <p className="text-sm font-medium text-green-600">🎉 Winner!</p>
-                    <p className="text-4xl font-bold text-green-700">{currentWinner.full_name || currentWinner}</p>
-                    {currentWinner.id && (
-                      <p className="text-sm text-green-600">User ID: {currentWinner.id}</p>
-                    )}
-                    <p className="text-xs text-green-500 mt-1">Selected</p>
-                  </div>
-                </div>
-              )}
             </div>
 
-            <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-              <span>🎯 {winners.length} winners</span>
-              <span>•</span>
-              <span>📊 {Math.max(totalParticipants - winners.length, 0)} remaining</span>
-              <span>•</span>
-              <span>👥 {totalParticipants} registered users</span>
-            </div>
           </div>
         </div>
 
@@ -298,7 +262,7 @@ const DrawWheel = () => {
           <WheelStatus
             status={status}
             totalParticipants={totalParticipants}
-            luckyCount={luckyNumbers.length}
+            luckyCount={0}
             winnersCount={winners.length}
             remainingCount={Math.max(totalParticipants - winners.length, 0)}
             currentSpin={winners.length}
@@ -313,33 +277,6 @@ const DrawWheel = () => {
             results={results}
           />
 
-          <WinnerHistory
-            results={results}
-            maxDisplay={10}
-          />
-
-          {/* Draw Info */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h4 className="font-semibold text-gray-700 text-sm mb-2">📋 Draw Info</h4>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Draw Number</span>
-                <span className="font-medium">#{draw.draw_number}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Participants</span>
-                <span className="font-medium">{totalParticipants}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Created By</span>
-                <span className="font-medium">{draw.creator?.full_name || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
-                <span className="font-medium capitalize">{status.toLowerCase()}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

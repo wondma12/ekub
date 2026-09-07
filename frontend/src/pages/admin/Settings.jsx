@@ -10,7 +10,7 @@ const Settings = () => {
   const [selectedDraw, setSelectedDraw] = useState(null);
   const [luckyNumbers, setLuckyNumbers] = useState([]);
   const [selectedLucky, setSelectedLucky] = useState([]);
-  const [totalNumbers, setTotalNumbers] = useState(0);
+  const [wheelNumbers, setWheelNumbers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -45,7 +45,11 @@ const Settings = () => {
         setSelectedDraw(data.draw);
         setLuckyNumbers(data.luckyNumbers || []);
         setSelectedLucky((data.luckyNumbers || []).map(Number));
-        setTotalNumbers(data.totalNumbers || 0);
+        setWheelNumbers(
+          (data.draw.numbers || [])
+            .map((drawNumber) => Number(drawNumber.number))
+            .filter((number) => Number.isInteger(number))
+        );
       } catch (requestError) {
         setError(requestError.message || 'Failed to load draw settings');
       }
@@ -84,7 +88,7 @@ const Settings = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">Configure lucky numbers for each draw.</p>
+        <p className="mt-1 text-sm text-gray-500">Choose optional labels for each draw. All wheel numbers still have an equal chance when spinning.</p>
       </div>
 
       {error && <Alert type="error" onDismiss={() => setError(null)}>{error}</Alert>}
@@ -138,9 +142,9 @@ const Settings = () => {
           </>
         )}
       >
-        <p className="text-sm text-gray-600 mb-4">Select up to 7 wheel numbers. They will be picked first.</p>
+        <p className="text-sm text-gray-600 mb-4">Select up to 7 wheel numbers. They will be selected first in the order shown.</p>
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-80 overflow-y-auto">
-          {Array.from({ length: totalNumbers }, (_, index) => index + 1).map((number) => {
+          {wheelNumbers.map((number) => {
             const isSelected = selectedLucky.includes(number);
             return (
               <button

@@ -67,8 +67,6 @@ class AuthService {
       throw new Error('Invalid email or password');
     }
 
-    await user.update({ last_login: new Date() });
-
     const userResponse = user.toJSON();
     delete userResponse.password_hash;
 

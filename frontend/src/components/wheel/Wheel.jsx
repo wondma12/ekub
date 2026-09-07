@@ -11,14 +11,12 @@ const Wheel = ({
 }) => {
   const canvasRef = useRef(null);
   const [rotation, setRotation] = useState(0);
-  const [currentHighlight, setCurrentHighlight] = useState(null);
   const animationRef = useRef(null);
 
   const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-    '#F8C471', '#82E0AA', '#F1948A', '#85929E', '#73C6B6',
-    '#E59866', '#A9DFBF', '#F5B7B1', '#AED6F1', '#F9E79F',
+    '#ef4444', '#f97316', '#facc15', '#22c55e', '#14b8a6',
+    '#06b6d4', '#3b82f6', '#4f46e5', '#7c3aed', '#db2777',
+    '#e11d48', '#0f766e', '#2563eb', '#9333ea', '#ea580c',
   ];
 
   useEffect(() => {
@@ -60,9 +58,9 @@ const Wheel = ({
       ctx.closePath();
 
       if (isWinner) {
-        ctx.fillStyle = '#28a745';
-        ctx.shadowColor = 'rgba(40, 167, 69, 0.5)';
-        ctx.shadowBlur = 20;
+        ctx.fillStyle = '#16a34a';
+        ctx.shadowColor = 'rgba(22, 163, 74, 0.75)';
+        ctx.shadowBlur = 18;
       } else {
         ctx.fillStyle = colors[colorIndex];
         ctx.shadowColor = 'transparent';
@@ -70,8 +68,8 @@ const Wheel = ({
       }
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
 
       // Draw number
@@ -83,13 +81,13 @@ const Wheel = ({
       
       if (isWinner) {
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px Arial';
+        ctx.font = 'bold 17px Arial';
       } else {
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = 'bold 10px Arial';
       }
       
-      ctx.fillText(num, radius * 0.65, 0);
+      ctx.fillText(num, radius * 0.92, 0);
       ctx.restore();
 
       // Draw winner crown
@@ -101,25 +99,25 @@ const Wheel = ({
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#FFD700';
-        ctx.fillText('👑', radius * 0.85, 0);
+        ctx.fillText('', radius * 0.75, 0);
         ctx.restore();
       }
     });
 
     // Draw center circle
     const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 35);
-    gradient.addColorStop(0, '#fff');
-    gradient.addColorStop(1, '#f0f0f0');
+    gradient.addColorStop(0, '#263746');
+    gradient.addColorStop(1, '#111c26');
     ctx.beginPath();
     ctx.arc(centerX, centerY, 35, 0, 2 * Math.PI);
     ctx.fillStyle = gradient;
     ctx.fill();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#f8fafc';
+    ctx.lineWidth = 4;
     ctx.stroke();
 
     // Draw center text
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#fff';
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -127,25 +125,36 @@ const Wheel = ({
 
     // Draw pointer (triangle at top)
     ctx.beginPath();
-    ctx.moveTo(centerX, 15);
-    ctx.lineTo(centerX - 15, 35);
-    ctx.lineTo(centerX + 15, 35);
+    ctx.moveTo(centerX, 12);
+    ctx.lineTo(centerX - 13, 31);
+    ctx.lineTo(centerX + 13, 31);
     ctx.closePath();
-    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = '#ef233c';
     ctx.fill();
-    ctx.shadowColor = 'rgba(255, 0, 0, 0.3)';
-    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(239, 35, 60, 0.35)';
+    ctx.shadowBlur = 7;
     ctx.fill();
     ctx.shadowBlur = 0;
   };
 
-  const spinWheel = () => {
+  const spinWheel = async () => {
     if (disabled || isSpinning || numbers.length === 0) return;
 
-    onSpin();
+    const spinResult = await onSpin();
+    if (!spinResult?.number) return;
 
-    const spins = 5 + Math.random() * 5;
-    const targetRotation = rotation + spins * 2 * Math.PI + Math.random() * 0.5;
+    const selectedNumber = spinResult?.number;
+    const selectedIndex = numbers.findIndex(number => number === selectedNumber);
+    const sliceAngle = (2 * Math.PI) / numbers.length;
+    const targetIndex = selectedIndex >= 0
+      ? selectedIndex
+      : Math.floor(Math.random() * numbers.length);
+    const sliceCenterAngle = (targetIndex + 0.5) * sliceAngle;
+    const pointerAngle = -Math.PI / 2;
+    const rotationToTarget = ((pointerAngle - sliceCenterAngle - rotation) % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
+
+    const spins = 5 + Math.floor(Math.random() * 5);
+    const targetRotation = rotation + spins * 2 * Math.PI + rotationToTarget;
     const duration = 4000 + Math.random() * 1000;
     const startTime = Date.now();
     const startRotation = rotation;
@@ -164,12 +173,7 @@ const Wheel = ({
         animationRef.current = requestAnimationFrame(animate);
       } else {
         setRotation(targetRotation);
-        // Calculate winner
-        const sliceAngle = (2 * Math.PI) / numbers.length;
-        const pointerAngle = (2 * Math.PI - targetRotation % (2 * Math.PI)) % (2 * Math.PI);
-        const winnerIndex = Math.floor(pointerAngle / sliceAngle);
-        const winner = numbers[winnerIndex % numbers.length];
-        onSpinComplete(winner);
+        onSpinComplete(selectedNumber || numbers[targetIndex], spinResult);
       }
     };
 
@@ -190,19 +194,19 @@ const Wheel = ({
         ref={canvasRef}
         width={size}
         height={size}
-        className="rounded-full shadow-2xl bg-white"
+        className="rounded-full shadow-2xl bg-[#101820]"
       />
       <button
         onClick={spinWheel}
         disabled={disabled || isSpinning || numbers.length === 0}
         className={`
           absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-          w-20 h-20 rounded-full border-4 border-white
+          w-24 h-24 rounded-none border-4 border-white
           font-bold text-white text-lg
           transition-all duration-200
           ${disabled || isSpinning || numbers.length === 0
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-105 hover:shadow-xl'
+            : 'bg-orange-500 hover:bg-orange-600 hover:scale-105 hover:shadow-xl'
           }
           shadow-lg
         `}

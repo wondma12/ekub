@@ -13,9 +13,6 @@ const WheelNumber = ({ number, isWinner, isLucky, isSelected, onClick }) => {
     if (isWinner) {
       return `${base} bg-green-500 text-white shadow-lg shadow-green-500/50 scale-110`;
     }
-    if (isLucky) {
-      return `${base} bg-yellow-400 text-gray-800 shadow-lg shadow-yellow-400/50`;
-    }
     if (isSelected) {
       return `${base} bg-indigo-500 text-white shadow-lg shadow-indigo-500/50`;
     }
@@ -25,9 +22,6 @@ const WheelNumber = ({ number, isWinner, isLucky, isSelected, onClick }) => {
   return (
     <div className={getClasses()} onClick={() => onClick && onClick(number)}>
       <span className="relative z-10">{number}</span>
-      {isLucky && !isWinner && (
-        <span className="absolute -top-2 -right-2 text-xs">⭐</span>
-      )}
       {isWinner && (
         <span className="absolute -top-2 -right-2 text-xs">👑</span>
       )}

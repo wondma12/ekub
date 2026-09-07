@@ -18,6 +18,7 @@ import {
 } from '../controllers/drawController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { roleMiddleware } from '../middleware/roleMiddleware.js';
+import { validateCreateDraw } from '../validators/drawValidator.js';
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ router.use(authMiddleware);
 router.use(roleMiddleware(['ADMIN', 'JUDGE']));
 
 // Draw management
-router.post('/', createDraw);
+router.post('/', validateCreateDraw, createDraw);
 router.put('/:drawId/lucky-numbers', setLuckyNumbers);
 router.post('/:drawId/cancel', cancelDraw);
 router.post('/:drawId/reset', resetDraw);

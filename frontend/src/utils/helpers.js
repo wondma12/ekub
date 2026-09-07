@@ -173,6 +173,13 @@ export const shuffleArray = (array) => {
 };
 
 /**
+ * Normalize wheel values into a sorted unique list.
+ */
+export const sortUniqueNumbers = (numbers) => {
+  return [...new Set(numbers.map(Number))].sort((first, second) => first - second);
+};
+
+/**
  * Get pagination range
  */
 export const getPaginationRange = (currentPage, totalPages, maxVisible = 5) => {

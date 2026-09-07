@@ -14,34 +14,40 @@ class DrawService {
         throw new Error(`Ekub ${data.ekub_id} was not found. Create an Ekub before creating a draw.`);
       }
 
-      const numberCount = Number(data.draw_number);
-      if (!Number.isInteger(numberCount) || numberCount < 1) {
-        throw new Error('Draw number must be a positive integer');
+      const wheelNumbers = Array.isArray(data.draw_numbers)
+        ? data.draw_numbers.map(number => Number(number))
+        : [];
+      if (wheelNumbers.length === 0) {
+        throw new Error('Enter at least one wheel number');
       }
+      if (wheelNumbers.some(number => !Number.isInteger(number) || number < 1)) {
+        throw new Error('Wheel numbers must be positive integers');
+      }
+      if (new Set(wheelNumbers).size !== wheelNumbers.length) {
+        throw new Error('Wheel numbers must be unique');
+      }
+
+      const numberCount = wheelNumbers.length;
 
       const draw = await Draw.create({
         ekub_id: data.ekub_id,
         cycle_id: data.cycle_id,
-        draw_number: data.draw_number,
-        title: data.title || `Draw #${data.draw_number}`,
-        min_number: 1,
-        max_number: numberCount,
+        draw_number: numberCount,
+        title: data.title || `Draw #${numberCount}`,
+        min_number: Math.min(...wheelNumbers),
+        max_number: Math.max(...wheelNumbers),
         lucky_spin_count: Math.min(data.lucky_spin_count || 7, numberCount),
         created_by: data.created_by,
         status: 'DRAFT',
       }, { transaction });
 
-      // Generate one wheel slot per configured number.
-      const numbers = [];
-      for (let i = 1; i <= numberCount; i++) {
-        numbers.push({
+      const numbers = wheelNumbers.map(number => ({
           draw_id: draw.id,
-          number: i,
+          number,
           status: 'ELIGIBLE',
           is_visible: true,
           is_lucky: false,
-        });
-      }
+        }));
 
       await DrawNumber.bulkCreate(numbers, { transaction });
 
@@ -76,10 +82,6 @@ class DrawService {
       if (new Set(normalizedNumbers).size !== normalizedNumbers.length) {
         throw new Error('Lucky numbers must be unique');
       }
-      if (normalizedNumbers.some(number => !Number.isInteger(number) || number < 1 || number > draw.max_number)) {
-        throw new Error('Lucky numbers must be valid wheel numbers');
-      }
-
       await DrawNumber.update(
         { is_lucky: false, lucky_order: null, status: 'ELIGIBLE' },
         { where: { draw_id: drawId, is_lucky: true }, transaction }
@@ -90,6 +92,10 @@ class DrawService {
         order: [['number', 'ASC']],
         transaction,
       });
+
+      if (normalizedNumbers.some(number => !drawNumbers.some(drawNumber => drawNumber.number === number))) {
+        throw new Error('Every lucky number must exist on the wheel');
+      }
 
       for (let index = 0; index < normalizedNumbers.length; index += 1) {
         const drawNumber = drawNumbers.find(number => number.number === normalizedNumbers[index]);
@@ -137,10 +143,6 @@ class DrawService {
         where: { draw_id: drawId },
         transaction,
       });
-      if (existingResults === 0) {
-        draw.max_number = draw.draw_number;
-      }
-
       draw.status = 'IN_PROGRESS';
       draw.started_at = new Date();
       await draw.save({ transaction });
@@ -177,13 +179,6 @@ class DrawService {
       if (!draw.is_active) throw new Error('Draw is deactivated');
       if (draw.status !== 'IN_PROGRESS') throw new Error('Draw is not in progress');
 
-      const previousResults = await DrawResult.findAll({
-        where: { draw_id: drawId },
-        attributes: ['draw_number_id', 'selection_type'],
-        transaction,
-      });
-      const previousNumberIds = new Set(previousResults.map(result => String(result.draw_number_id)));
-
       const remainingNumbers = await DrawNumber.findAll({
         where: { draw_id: drawId, status: { [Op.in]: ['ELIGIBLE', 'LUCKY'] } },
         transaction,
@@ -197,38 +192,19 @@ class DrawService {
         return { completed: true };
       }
 
+      const luckyNumbers = Array.isArray(draw.lucky_user_ids) ? draw.lucky_user_ids : [];
+      const nextLuckyNumber = luckyNumbers.find(number => (
+        remainingNumbers.some(candidate => candidate.number === Number(number))
+      ));
+
       let selectedNumber;
-      const luckyUserIds = Array.isArray(draw.lucky_user_ids) ? draw.lucky_user_ids : [];
-      const pendingLuckyNumber = luckyUserIds.find(number => {
-        const candidate = remainingNumbers.find(item => item.number === Number(number));
-        return candidate && !previousNumberIds.has(String(candidate.id));
-      });
-
-      if (pendingLuckyNumber) {
-        selectedNumber = await DrawNumber.findOne({
-          where: {
-            draw_id: drawId,
-            number: Number(pendingLuckyNumber),
-            status: 'LUCKY',
-            is_lucky: true,
-          },
-          order: [['lucky_order', 'ASC']],
-          transaction,
-        });
-
-        if (!selectedNumber) {
-          throw new Error('A configured lucky number is unavailable');
-        }
+      if (nextLuckyNumber !== undefined) {
+        selectedNumber = remainingNumbers.find(
+          candidate => candidate.number === Number(nextLuckyNumber)
+        );
       } else {
-        // Lucky numbers are exhausted; choose from the remaining wheel numbers randomly.
-        selectedNumber = await DrawNumber.findOne({
-          where: {
-            draw_id: drawId,
-            status: 'ELIGIBLE',
-          },
-          order: sequelize.random(),
-          transaction,
-        });
+        const randomIndex = Math.floor(Math.random() * remainingNumbers.length);
+        selectedNumber = remainingNumbers[randomIndex];
       }
 
       if (!selectedNumber) {
@@ -263,7 +239,7 @@ class DrawService {
         user: null,
         isLucky: selectedNumber.is_lucky,
         spinNumber: draw.current_spin,
-        totalSpins: draw.max_number,
+        totalSpins: draw.draw_number,
       };
     } catch (error) {
       await transaction.rollback();

@@ -9,7 +9,7 @@ export const authService = {
       const response = await api.post('/auth/register', userData);
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || 'Registration failed';
+      throw new Error(error.response?.data?.error || error.message || 'Registration failed');
     }
   },
 
@@ -32,7 +32,7 @@ export const authService = {
       
       return data;
     } catch (error) {
-      throw error.response?.data?.error || 'Login failed';
+      throw new Error(error.response?.data?.error || error.message || 'Login failed');
     }
   },
 

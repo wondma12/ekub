@@ -29,10 +29,9 @@ const WinnerHistory = ({ results, maxDisplay = 20 }) => {
           <table className="w-full text-sm">
             <thead className="bg-gray-100 sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spin</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -40,17 +39,17 @@ const WinnerHistory = ({ results, maxDisplay = 20 }) => {
                 const actualIndex = showAll ? index : results.length - displayResults.length + index;
                 return (
                   <tr key={actualIndex} className="hover:bg-gray-100 transition-colors">
-                    <td className="px-3 py-2 text-gray-400 text-xs">{actualIndex + 1}</td>
+                    <td className="px-3 py-2 text-gray-500 text-xs font-medium">
+                      Spin {result.spin_number || actualIndex + 1}
+                    </td>
                     <td className="px-3 py-2 font-bold text-gray-700">
-                      {result.user?.full_name || `User ${result.number}`}
-                      {result.user?.id && <span className="block text-xs font-normal text-gray-500">ID: {result.user.id}</span>}
+                      {result.number}
                     </td>
                     <td className="px-3 py-2">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         Selected
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-gray-400 text-xs">#{result.spin_number}</td>
                   </tr>
                 );
               })}

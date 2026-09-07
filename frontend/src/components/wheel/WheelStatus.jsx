@@ -25,7 +25,7 @@ const WheelStatus = ({
         progress: 0,
       },
       IN_PROGRESS: {
-        label: 'In Progress',
+        label: 'በሂደት ላይ',
         color: 'bg-green-100 text-green-800',
         icon: '🔄',
         progress: totalParticipants ? winnersCount / totalParticipants * 100 : 0,
@@ -67,7 +67,7 @@ const WheelStatus = ({
       <div className={`grid grid-cols-2 ${showLuckyCount ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-3`}>
         <div className="bg-white rounded-lg border border-gray-200 p-3 text-center">
           <p className="text-xl font-bold text-gray-900">{totalParticipants || 0}</p>
-          <p className="text-xs text-gray-500">Draw Numbers</p>
+          <p className="text-xs text-gray-500">ያልደረሳቸው የተመዝገቢ ሰው ብዛት</p>
         </div>
         {showLuckyCount && (
           <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-3 text-center">
@@ -77,11 +77,11 @@ const WheelStatus = ({
         )}
         <div className="bg-green-50 rounded-lg border border-green-200 p-3 text-center">
           <p className="text-xl font-bold text-green-700">{winnersCount || 0}</p>
-          <p className="text-xs text-green-600">🏆 Winners</p>
+          <p className="text-xs text-green-600">🏆 አሸናፊዎች ብዛት</p>
         </div>
         <div className="bg-blue-50 rounded-lg border border-blue-200 p-3 text-center">
           <p className="text-xl font-bold text-blue-700">{remainingCount || 0}</p>
-          <p className="text-xs text-blue-600">Remaining</p>
+          <p className="text-xs text-blue-600">ቀሪዎች ብዛት</p>
         </div>
       </div>
 

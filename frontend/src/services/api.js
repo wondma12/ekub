@@ -2,6 +2,14 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+const getErrorMessage = (error) => {
+  const responseError = error.response?.data?.error;
+  if (typeof responseError === 'string') return responseError;
+  if (responseError?.message) return responseError.message;
+  if (typeof error.message === 'string') return error.message;
+  return 'Request failed';
+};
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -68,17 +76,17 @@ api.interceptors.response.use(
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
       // User doesn't have permission
-      console.error('Forbidden access:', error.response.data);
+      console.error('Forbidden access:', getErrorMessage(error));
     }
 
     // Handle 404 Not Found
     if (error.response?.status === 404) {
-      console.error('Resource not found:', error.response.data);
+      console.error('Resource not found:', getErrorMessage(error));
     }
 
     // Handle 500 Server Error
     if (error.response?.status >= 500) {
-      console.error('Server error:', error.response.data);
+      console.error('Server error:', getErrorMessage(error));
     }
 
     return Promise.reject(error);

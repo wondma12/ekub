@@ -8,7 +8,7 @@ const CreateDraw = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     ekub_id: '1',
-    draw_number: '',
+    draw_numbers: '',
     title: '',
     lucky_spin_count: '7',
   });
@@ -26,9 +26,19 @@ const CreateDraw = () => {
     setIsSubmitting(true);
 
     try {
+      const values = form.draw_numbers.split(',').map((value) => value.trim());
+      if (values.some((value) => !/^\d+$/.test(value) || Number(value) < 1)) {
+        throw new Error('Enter only positive whole numbers separated by commas');
+      }
+
+      const drawNumbers = values.map((value) => Number(value));
+      if (new Set(drawNumbers).size !== drawNumbers.length) {
+        throw new Error('Wheel numbers must be unique');
+      }
+
       const draw = await drawService.createDraw({
         ekub_id: Number(form.ekub_id),
-        draw_number: Number(form.draw_number),
+        draw_numbers: drawNumbers,
         title: form.title.trim() || undefined,
         lucky_spin_count: Number(form.lucky_spin_count),
       });
@@ -52,7 +62,7 @@ const CreateDraw = () => {
         </button>
         <h1 className="mt-3 text-2xl font-bold text-gray-900">Create New Draw</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Set up the draw, then choose lucky numbers and spin the wheel.
+          Enter the wheel numbers, then spin the wheel.
         </p>
       </div>
 
@@ -79,16 +89,16 @@ const CreateDraw = () => {
         </div>
 
         <div>
-          <label htmlFor="draw_number" className="block text-sm font-medium text-gray-700">Draw number</label>
+          <label htmlFor="draw_numbers" className="block text-sm font-medium text-gray-700">Wheel numbers</label>
+          <p className="mt-1 text-xs text-gray-500">Enter each number separated by commas. These exact numbers will appear on the wheel.</p>
           <input
-            id="draw_number"
-            name="draw_number"
-            type="number"
-            min="1"
+            id="draw_numbers"
+            name="draw_numbers"
+            type="text"
             required
-            value={form.draw_number}
+            value={form.draw_numbers}
             onChange={handleChange}
-            placeholder="For example, 1"
+            placeholder="For example, 5, 12, 27, 44"
             className="form-input mt-1"
           />
         </div>
