@@ -11,6 +11,7 @@ const routes = [
   'settings',
   'draws',
   'draws/new',
+  'draws/39/public',
 ];
 
 for (const route of routes) {
