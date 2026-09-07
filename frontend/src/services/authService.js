@@ -21,13 +21,16 @@ export const authService = {
       const response = await api.post('/auth/login', { email, password });
       const { data } = response.data;
       
-      // Store tokens and user data
+      // Keep authentication scoped to the current browser tab.
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('user', JSON.stringify(data.user));
         if (data.refreshToken) {
-          localStorage.setItem('refreshToken', data.refreshToken);
+          sessionStorage.setItem('refreshToken', data.refreshToken);
         }
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
       }
       
       return data;
@@ -46,6 +49,9 @@ export const authService = {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage regardless of API response
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('user');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
@@ -73,7 +79,7 @@ export const authService = {
       const { user } = response.data.data;
       
       // Update stored user data
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('user', JSON.stringify(user));
       
       return user;
     } catch (error) {
@@ -139,8 +145,8 @@ export const authService = {
    * Check if user is authenticated
    */
   isAuthenticated: () => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
+    const token = sessionStorage.getItem('token');
+    const user = sessionStorage.getItem('user');
     return !!(token && user);
   },
 
@@ -149,7 +155,7 @@ export const authService = {
    */
   getStoredUser: () => {
     try {
-      const user = localStorage.getItem('user');
+      const user = sessionStorage.getItem('user');
       return user ? JSON.parse(user) : null;
     } catch {
       return null;
@@ -160,7 +166,7 @@ export const authService = {
    * Get stored token
    */
   getToken: () => {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   },
 
   /**
@@ -168,7 +174,7 @@ export const authService = {
    */
   refreshToken: async () => {
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = sessionStorage.getItem('refreshToken');
       if (!refreshToken) {
         throw new Error('No refresh token available');
       }
@@ -176,7 +182,7 @@ export const authService = {
       const response = await api.post('/auth/refresh-token', { refreshToken });
       const { token } = response.data.data;
       
-      localStorage.setItem('token', token);
+      sessionStorage.setItem('token', token);
       return token;
     } catch (error) {
       throw error.response?.data?.error || 'Failed to refresh token';
