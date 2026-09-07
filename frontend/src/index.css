@@ -115,6 +115,68 @@
 .home-page .space-y-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }.home-page .space-y-3 > div { min-height: 230px; background: rgba(255,255,255,.5); border: 1px solid rgba(23, 59, 58, .1); }.home-page .bg-white.rounded-xl { background: rgba(255,255,255,.72); border-radius: 0; }.home-page .text-red-600 { color: #ad4d3c; }
 @media (max-width: 720px) { .home-page { padding: 0 20px 42px; }.home-header { height: 72px; gap: 12px; }.home-header-note { display: none; }.home-header-link { margin-left: auto; font-size: 11px; }.home-hero { min-height: 0; display: flex; flex-direction: column; align-items: stretch; padding-top: 64px; }.home-hero h1 { font-size: 54px; }.home-hero-art { min-height: 330px; margin-top: 15px; }.home-sun { width: 190px; height: 190px; top: 64px; left: 18%; }.home-ticket { width: 145px; height: 200px; }.home-ticket-front { left: 42%; top: 50px; }.home-ticket-back { left: 12%; top: 100px; }.home-ticket-front strong { margin-top: 22px; font-size: 23px; }.home-stats { grid-template-columns: 1fr; }.home-stats > div { min-height: 66px; border-right: 0; border-bottom: 1px solid rgba(23, 59, 58, .2); }.home-section-heading { align-items: start; flex-direction: column; gap: 18px; }.home-draws-section { margin-top: 54px; } }
 
+/* Login page uses the same editorial palette as the public home. */
+.login-page { --ink: #173b3a; --muted: #6f8581; --cream: #f7f5ef; --teal: #0e6b68; --coral: #ef765f; --gold: #e3b653; display: flex; flex-direction: column; align-items: center; color: var(--ink); background: var(--cream); background-image: radial-gradient(rgba(23, 59, 58, .07) 1px, transparent 1px); background-size: 18px 18px; }
+.login-shell { margin: auto; }
+.login-home-link { align-self: flex-start; color: var(--teal); font-size: 13px; font-weight: 700; }
+.login-brand-mark { display: grid; place-items: center; width: 68px; height: 68px; color: var(--cream); background: var(--teal); font: 700 36px Georgia, serif; transform: rotate(-8deg); box-shadow: 8px 8px 0 rgba(239, 118, 95, .22); }
+.login-page h2 { color: var(--ink); font: 400 42px/.95 Georgia, serif; }
+.login-page .text-sm { color: var(--muted); }
+.login-form { padding: 30px; background: rgba(255,255,255,.78); border: 1px solid rgba(23, 59, 58, .16); box-shadow: 10px 14px 0 rgba(14, 107, 104, .1); }
+.login-form .form-label { color: var(--ink); }
+.login-form .form-input { border-color: rgba(23, 59, 58, .24); border-radius: 0; background: #fffdf8; }
+.login-form .form-input:focus { border-color: var(--teal); --tw-ring-color: var(--teal); }
+.login-accent-link { color: var(--teal); }
+.login-accent-link:hover { color: var(--coral); }
+.login-submit { background: var(--teal) !important; border-radius: 0 !important; box-shadow: 6px 6px 0 rgba(239, 118, 95, .25); }
+.login-submit:hover { background: #094f4d !important; }
+.login-demo { color: var(--muted); background: rgba(227, 182, 83, .16); border: 1px solid rgba(153, 114, 24, .25); }
+.login-demo code { padding: 3px 6px; color: var(--ink); background: rgba(255,255,255,.65); border-radius: 0; }
+
+/* Draw management follows the public archive styling. */
+.admin-draws { --ink: #173b3a; --muted: #6f8581; --cream: #f7f5ef; --teal: #0e6b68; --coral: #ef765f; min-height: calc(100vh - 32px); padding: 28px clamp(18px, 3vw, 42px) 52px; color: var(--ink); background: var(--cream); background-image: radial-gradient(rgba(23, 59, 58, .07) 1px, transparent 1px); background-size: 18px 18px; }
+.admin-draws-kicker { margin-bottom: 8px; color: var(--coral); font-size: 10px; font-weight: 800; letter-spacing: 2.4px; }
+.admin-draws > div:first-child { padding-bottom: 22px; border-bottom: 1px solid rgba(23, 59, 58, .16); }
+.admin-draws .admin-draw-card { border-radius: 0; border-color: rgba(23, 59, 58, .16); box-shadow: none; background: rgba(255,255,255,.72); transition: transform .2s, box-shadow .2s, background .2s; }
+.admin-draws .admin-draw-card:hover { background: #fff; box-shadow: 8px 10px 0 rgba(14, 107, 104, .1); transform: translateY(-3px); }
+.admin-draws .admin-draw-card h3 { color: var(--ink); font-family: Georgia, serif; }
+.admin-draws .admin-draw-card .text-gray-500 { color: var(--muted); }
+.admin-draws .admin-draw-card .text-gray-700 { color: var(--ink); }
+.admin-draws > form, .admin-draws > div.bg-white { border-radius: 0; border-color: rgba(23, 59, 58, .16); box-shadow: none; background: rgba(255,255,255,.72); }
+.admin-draws .form-input { border-radius: 0; border-color: rgba(23, 59, 58, .24); background: #fffdf8; }
+.admin-draws .form-input:focus { border-color: var(--teal); --tw-ring-color: var(--teal); }
+.admin-draws .bg-gradient-to-r.from-indigo-500 { background-image: none; background-color: var(--teal); border-radius: 0; }
+.admin-draws .bg-indigo-600 { background-color: var(--teal); border-radius: 0; }
+.admin-draws .bg-indigo-600:hover { background-color: #094f4d; }
+.admin-ekubs { --ink: #173b3a; --muted: #6f8581; --cream: #f7f5ef; --teal: #0e6b68; --coral: #ef765f; min-height: calc(100vh - 32px); padding: 28px clamp(18px, 3vw, 42px) 52px; color: var(--ink); background: var(--cream); background-image: radial-gradient(rgba(23, 59, 58, .07) 1px, transparent 1px); background-size: 18px 18px; }
+.admin-ekubs > div:first-child { padding-bottom: 22px; border-bottom: 1px solid rgba(23, 59, 58, .16); }
+.admin-ekubs-kicker { margin-bottom: 8px; color: var(--coral); font-size: 10px; font-weight: 800; letter-spacing: 2.4px; }
+.admin-ekubs .admin-ekub-card, .admin-ekubs .admin-ekub-form { border-radius: 0; border-color: rgba(23, 59, 58, .16); box-shadow: none; background: rgba(255,255,255,.72); }
+.admin-ekubs .admin-ekub-card { transition: transform .2s, box-shadow .2s, background .2s; }
+.admin-ekubs .admin-ekub-card:hover { background: #fff; box-shadow: 8px 10px 0 rgba(14, 107, 104, .1); transform: translateY(-3px); }
+.admin-ekubs .admin-ekub-card h2 { color: var(--ink); font-family: Georgia, serif; }
+.admin-ekubs .admin-ekub-card .text-gray-500 { color: var(--muted); }
+.admin-ekubs .admin-ekub-form .form-input { border-radius: 0; border-color: rgba(23, 59, 58, .24); background: #fffdf8; }
+.admin-ekubs .admin-ekub-form .form-input:focus { border-color: var(--teal); --tw-ring-color: var(--teal); }
+.admin-ekubs-secondary { border-color: var(--teal); color: var(--teal); background: transparent; }
+.admin-ekubs-secondary:hover { color: #fff; background: var(--teal); }
+.admin-ekubs .bg-gradient-to-r.from-indigo-500 { background-image: none; background-color: var(--teal); border-radius: 0; }
+.admin-users { --ink: #173b3a; --muted: #6f8581; --cream: #f7f5ef; --teal: #0e6b68; --coral: #ef765f; min-height: calc(100vh - 32px); padding: 28px clamp(18px, 3vw, 42px) 52px; color: var(--ink); background: var(--cream); background-image: radial-gradient(rgba(23, 59, 58, .07) 1px, transparent 1px); background-size: 18px 18px; }
+.admin-users > div:first-child { padding-bottom: 22px; border-bottom: 1px solid rgba(23, 59, 58, .16); }
+.admin-users-kicker { margin-bottom: 8px; color: var(--coral); font-size: 10px; font-weight: 800; letter-spacing: 2.4px; }
+.admin-users-filters { border-radius: 0; border-color: rgba(23, 59, 58, .16); box-shadow: none; background: rgba(255,255,255,.72); }
+.admin-users-filters .form-input { border-radius: 0; border-color: rgba(23, 59, 58, .24); background: #fffdf8; }
+.admin-users-filters .form-input:focus { border-color: var(--teal); --tw-ring-color: var(--teal); }
+.admin-users-table { overflow-x: auto; border-radius: 0; border-color: rgba(23, 59, 58, .16); background: rgba(255,255,255,.78); box-shadow: none; }
+.admin-users-table .table thead { background: #dcebe7; }
+.admin-users-table .table th { color: var(--ink); }
+.admin-users-table .table tbody tr { border-color: rgba(23, 59, 58, .12); }
+.admin-users-table .table tbody tr:hover { background: rgba(227, 182, 83, .1); }
+.admin-users-table .bg-gradient-to-r.from-indigo-500 { background-image: none; background-color: var(--teal); }
+.admin-users-table .text-indigo-600 { color: var(--teal); }
+.admin-users-table > div:last-child { background: rgba(227, 182, 83, .12); border-color: rgba(23, 59, 58, .12); border-radius: 0; }
+.admin-users-table .bg-indigo-600 { background-color: var(--teal); }
+
 @layer components {
   /* Form elements */
   .form-input {

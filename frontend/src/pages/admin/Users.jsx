@@ -135,11 +135,12 @@ const Users = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="admin-users space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+          <p className="admin-users-kicker">THE COMMUNITY DIRECTORY</p>
+          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
           <p className="text-sm text-gray-500">Manage all users in the system</p>
         </div>
         <Button variant="primary" onClick={handleCreateUser}>
@@ -158,7 +159,7 @@ const Users = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="admin-users-filters bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <input

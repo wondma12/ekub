@@ -128,19 +128,20 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="login-page min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="login-shell max-w-md w-full space-y-8">
+        <Link to="/" className="login-home-link">← Back to Digital Ekub</Link>
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">E</span>
+            <div className="login-brand-mark">
+              <span>E</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 text-3xl font-bold">
             Welcome Back
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm">
             Sign in to your Digital Ekub account
           </p>
         </div>
@@ -157,7 +158,7 @@ const Login = () => {
         )}
 
         {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="login-form mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* Email */}
             <div>
@@ -248,7 +249,7 @@ const Login = () => {
                   type="checkbox"
                   checked={formData.remember}
                   onChange={handleChange}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 border-gray-300 rounded"
                 />
                 <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
                   Remember me
@@ -256,7 +257,7 @@ const Login = () => {
               </div>
               <Link
                 to="/forgot-password"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                className="login-accent-link text-sm font-medium"
               >
                 Forgot password?
               </Link>
@@ -270,43 +271,12 @@ const Login = () => {
             fullWidth
             loading={isLoading}
             disabled={isLoading}
-            className="py-3 text-lg"
+            className="login-submit py-3 text-lg"
           >
             Sign In
           </Button>
 
-          {/* Register Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link
-                to="/register"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Create one now
-              </Link>
-            </p>
-          </div>
         </form>
-
-        {/* Demo Credentials */}
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            Demo Credentials
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-2 mt-1 text-xs">
-            <div className="flex items-center gap-1">
-              <span className="text-gray-400">Admin:</span>
-              <code className="bg-gray-200 px-1.5 py-0.5 rounded">admin@ekub.com</code>
-              <code className="bg-gray-200 px-1.5 py-0.5 rounded">admin123</code>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-gray-400">User:</span>
-              <code className="bg-gray-200 px-1.5 py-0.5 rounded">user@ekub.com</code>
-              <code className="bg-gray-200 px-1.5 py-0.5 rounded">user123</code>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

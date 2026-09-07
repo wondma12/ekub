@@ -73,7 +73,7 @@ const UserTable = ({
 
   return (
     <div>
-      <div className="table-container">
+      <div className="admin-users-table table-container">
         <table className="table">
           <thead>
             <tr>

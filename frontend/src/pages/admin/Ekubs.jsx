@@ -82,10 +82,11 @@ const Ekubs = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-ekubs space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ekubs</h1>
+          <p className="admin-ekubs-kicker">THE COMMUNITY ARCHIVE</p>
+          <h1 className="text-3xl font-bold text-gray-900">Ekubs</h1>
           <p className="mt-1 text-sm text-gray-500">Manage your rotating savings groups.</p>
         </div>
         <div className="flex gap-3">
@@ -94,7 +95,7 @@ const Ekubs = () => {
           </Button>
           <Link
             to="/draws/new"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border-2 border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50 transition-colors"
+            className="admin-ekubs-secondary inline-flex items-center justify-center px-5 py-2.5 rounded-lg border-2 font-semibold transition-colors"
           >
             Create Draw
           </Link>
@@ -104,7 +105,7 @@ const Ekubs = () => {
       {error && <Alert type="error" onDismiss={() => setError(null)}>{error}</Alert>}
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="admin-ekub-form bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Ekub' : 'Create Ekub'}</h2>
           <input name="name" required maxLength="150" value={form.name} onChange={handleChange} placeholder="Ekub name" className="form-input" />
           <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" rows="3" className="form-input" />
@@ -118,7 +119,7 @@ const Ekubs = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {ekubs.map((ekub) => (
-          <section key={ekub.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <section key={ekub.id} className="admin-ekub-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Ekub #{ekub.id}</p>
