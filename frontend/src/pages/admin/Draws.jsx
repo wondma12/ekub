@@ -219,7 +219,7 @@ const Draws = () => {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-4">
+        <div className="admin-draw-actions flex items-center gap-2 ml-4">
           {(draw.status === 'DRAFT' || draw.status === 'READY') && (
             <Button
               size="sm"

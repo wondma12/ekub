@@ -152,6 +152,37 @@
 .admin-draw-card .border-green-200 { border-color: rgba(14, 107, 104, .24); }
 .admin-draws .rounded-xl, .admin-draws .rounded-lg { border-radius: 0; }
 
+@media (max-width: 640px) {
+  .admin-shell { overflow-x: hidden; }
+  .admin-sidebar { width: min(18rem, calc(100vw - 32px)); }
+  .admin-users, .admin-ekubs, .admin-draws { padding: 20px 14px 36px; }
+  .admin-users-header, .admin-ekubs-header, .admin-draws-header { padding-bottom: 18px; }
+  .admin-users-header h1, .admin-ekubs-header h1, .admin-draws-header h1 { font-size: 2rem; }
+  .admin-users-header button, .admin-ekubs-header > div:last-child, .admin-draws-header button { width: 100%; }
+  .admin-ekubs-header > div:last-child { flex-direction: column; }
+  .admin-ekubs-header > div:last-child > * { width: 100%; }
+  .admin-draw-filters > div, .admin-users-filters form { gap: 10px; }
+  .admin-draw-filters > div > div:last-child,
+  .admin-users-filters form > div:last-child { display: grid; grid-template-columns: 1fr 1fr; }
+  .admin-draw-filters select, .admin-draw-filters button { width: 100%; }
+  .admin-draw-card { padding: 16px; }
+  .admin-draw-card > div:first-child { flex-direction: column; gap: 16px; }
+  .admin-draw-card h3 { min-width: 0; font-size: 1.1rem; overflow-wrap: anywhere; }
+  .admin-draw-card > div:first-child > div:first-child > div:first-child { flex-wrap: wrap; }
+  .admin-draw-actions { width: 100%; margin-left: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-draw-actions .btn { width: 100%; }
+  .admin-ekub-card { padding: 18px; }
+  .admin-ekub-card h2 { font-size: 1.35rem; overflow-wrap: anywhere; }
+  .admin-ekub-card > div:first-child { align-items: flex-start; }
+  .admin-ekubs-form { padding: 18px; }
+  .admin-ekubs-form > div:last-child, .admin-draw-edit > div:last-child { flex-wrap: wrap; }
+  .admin-ekubs-form > div:last-child > *, .admin-draw-edit > div:last-child > * { flex: 1 1 120px; }
+  .admin-users-filters { padding: 12px; }
+  .admin-users-table .table { min-width: 680px; }
+  .admin-users-table > div:last-child { flex-direction: column; align-items: stretch; gap: 12px; }
+  .admin-users-table > div:last-child > div:last-child { display: flex; justify-content: flex-end; flex-wrap: wrap; }
+}
+
 /* Public draw room */
 .home-page {
   --ink: #173b3a;
